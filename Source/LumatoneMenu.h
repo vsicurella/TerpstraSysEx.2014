@@ -39,7 +39,14 @@ namespace Lumatone {
 
 			recentFilesBaseID = 0x200300,
 
-			aboutSysEx = 0x200400
+			// Keyboard View Modes
+			toggleKeyProperties = 0x200401,
+
+			// colourViewSubMenu = 0x200500,
+			colourViewRGB = 0x200501,
+			colourViewModel = 0x200502,
+
+			aboutSysEx = 0x300100
 		};
 
 		class MainMenuModel : public juce::MenuBarModel
@@ -53,9 +60,10 @@ namespace Lumatone {
 			PopupMenu getMenuForIndex(int topLevelMenuIndex, const String& menuName);
 			void menuItemSelected(int menuItemID, int topLevelMenuIndex);
 
-			virtual void createFileMenu(PopupMenu& menu);
-			virtual void createEditMenu(PopupMenu& menu);
-			virtual void createHelpMenu(PopupMenu& menu);
+			void createFileMenu(PopupMenu& menu);
+			void createEditMenu(PopupMenu& menu);
+			void createHelpMenu(PopupMenu& menu);
+			void createColourViewSubMenu(PopupMenu& menu);
 
 		private:
 			ApplicationCommandManager * theManager;

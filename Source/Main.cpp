@@ -249,9 +249,12 @@ void TerpstraSysExApplication::getAllCommands(juce::Array <juce::CommandID>& com
         Lumatone::Menu::commandIDs::undo,
         Lumatone::Menu::commandIDs::redo,
 
-        Lumatone::Debug::commandIDs::toggleDeveloperMode,
+        Lumatone::Menu::commandIDs::toggleKeyProperties,
+        Lumatone::Menu::commandIDs::colourViewRGB,
+        Lumatone::Menu::commandIDs::colourViewModel,
 
-        Lumatone::Menu::commandIDs::aboutSysEx
+        Lumatone::Menu::commandIDs::aboutSysEx,
+        Lumatone::Debug::commandIDs::toggleDeveloperMode
     };
 
     commands.addArray(ids, juce::numElementsInArray(ids));
@@ -352,6 +355,39 @@ void TerpstraSysExApplication::getCommandInfo(juce::CommandID commandID, juce::A
         result.setActive(undoManager.canRedo());
         break;
 
+    case Lumatone::Menu::commandIDs::toggleKeyProperties:
+        result.setInfo("Key Properties", "Toggle Key Properties", "Keyboard", 0);
+        // result.addDefaultKeypress('y', juce::ModifierKeys::commandModifier);
+        // result.addDefaultKeypress('z', juce::ModifierKeys::commandModifier + juce::ModifierKeys::shiftModifier);
+        result.setActive(true);
+        result.setTicked(state.getBoolProperty(LumatoneEditorProperty::ShowKeyProperties, false));
+        break;
+
+    case Lumatone::Menu::commandIDs::colourViewRGB:
+        result.setInfo("RGB", "", "Colour", 0);
+        // result.addDefaultKeypress('y', juce::ModifierKeys::commandModifier);
+        // result.addDefaultKeypress('z', juce::ModifierKeys::commandModifier + juce::ModifierKeys::shiftModifier);
+        result.setActive(true);
+
+        {
+            auto mode = state.getStringProperty(LumatoneApplicationProperty::ColourMode, "");
+            result.setTicked(mode == "RGB");
+        }
+
+        break;
+
+    case Lumatone::Menu::commandIDs::colourViewModel:
+        result.setInfo("Colour Model", "Redo latest edit", "Colour", 0);
+        // result.addDefaultKeypress('y', juce::ModifierKeys::commandModifier);
+        // result.addDefaultKeypress('z', juce::ModifierKeys::commandModifier + juce::ModifierKeys::shiftModifier);
+        result.setActive(true);
+
+        {
+            auto mode = state.getStringProperty(LumatoneApplicationProperty::ColourMode, "");
+            result.setTicked(mode.isEmpty() || mode.equalsIgnoreCase("ModelAdjusted") || mode.equalsIgnoreCase("None"));
+        }
+        break;
+
     case Lumatone::Menu::commandIDs::aboutSysEx:
         result.setInfo("About Lumatone Editor", "Shows version and copyright", "Help", 0);
         break;
@@ -406,6 +442,16 @@ bool TerpstraSysExApplication::perform(const juce::ApplicationCommandTarget::Inv
 
     case Lumatone::Menu::commandIDs::redo:
         return redo();
+
+    case Lumatone::Menu::toggleKeyProperties:
+        toggleKeyProperties();
+        return true;
+    case Lumatone::Menu::colourViewRGB:
+        setColourMode(LumatoneApplicationState::ColourModes::RGB);
+        return true;
+    case Lumatone::Menu::colourViewModel:
+        setColourMode(LumatoneApplicationState::ColourModes::ModelAdjusted);
+        return true;
 
     case Lumatone::Menu::commandIDs::aboutSysEx:
         return aboutTerpstraSysEx();

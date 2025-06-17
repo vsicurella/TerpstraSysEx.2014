@@ -125,6 +125,9 @@ private:
     // Buffer for copy/paste of sub board data
     std::unique_ptr<LumatoneBoard>			copiedSubBoardData;
 
+    // Keyboard view controls
+    std::unique_ptr<juce::TextButton>   toggleKeyPropertiesButton;
+
 
     //==============================================================================
     // Position and Size helpers

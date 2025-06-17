@@ -58,8 +58,12 @@ namespace Lumatone {
             menu.addCommandItem(theManager, pasteOctaveBoardNotes);
             menu.addCommandItem(theManager, pasteOctaveBoardColours);
             menu.addCommandItem(theManager, pasteOctaveBoardTypes);
+			menu.addSeparator();
 			menu.addCommandItem(theManager, undo);
 			menu.addCommandItem(theManager, redo);
+			menu.addSeparator();
+			menu.addCommandItem(theManager, commandIDs::toggleKeyProperties);
+			createColourViewSubMenu(menu);
 		}
 
 		void MainMenuModel::createHelpMenu(PopupMenu& menu)
@@ -67,7 +71,15 @@ namespace Lumatone {
 			menu.addCommandItem(theManager, aboutSysEx);
 		}
 
-		PopupMenu MainMenuModel::getMenuForIndex(int topLevelMenuIndex, const String& menuName)
+        void MainMenuModel::createColourViewSubMenu(PopupMenu &menu)
+        {
+			juce::PopupMenu submenu;
+			submenu.addCommandItem(theManager, colourViewRGB);
+			submenu.addCommandItem(theManager, colourViewModel);
+			menu.addSubMenu("Colour Mode", submenu);
+        }
+
+        PopupMenu MainMenuModel::getMenuForIndex(int topLevelMenuIndex, const String& menuName)
 		{
 			PopupMenu menu;
 

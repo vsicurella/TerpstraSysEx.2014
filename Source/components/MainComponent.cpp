@@ -111,6 +111,10 @@ MainContentComponent::MainContentComponent(const LumatoneEditorState& stateIn, j
     lblFirmwareVersion->setColour(Label::ColourIds::textColourId, juce::Colour(0xff777777));
     addAndMakeVisible(lblFirmwareVersion.get());
 
+    toggleKeyPropertiesButton.reset(new juce::TextButton("toggleKeyPropertiesButton"));
+    addAndMakeVisible(toggleKeyPropertiesButton.get());
+    toggleKeyPropertiesButton->setButtonText("i");
+    toggleKeyPropertiesButton->setCommandToTrigger(commandManager, Lumatone::Menu::commandIDs::toggleKeyProperties, true);
 
     addStatusListener(this);
     addEditorListener(this);
@@ -401,7 +405,7 @@ void MainContentComponent::resized()
     btnClearSelection->setSize(clearSize, clearSize);
     btnClearSelection->setTopRightPosition(controlsArea.getRight(), lblEditTitle->getY() + (selectedKeyAreaHeight - clearSize) / 2);
 
-    resizeLabelWithHeight(lblSelectedKeys.get(), selectedKeyAreaHeight, 0.667f, "____");
+    resizeLabelWithHeight(lblSelectedKeys.get(), selectedKeyAreaHeight, 0.667f, "___");
     lblSelectedKeys->setTopRightPosition(btnClearSelection->getX() - (btnMargin * 2), lblEditTitle->getY());
 
     resizeEditSectionTabs();
@@ -419,7 +423,7 @@ void MainContentComponent::resized()
     resizeLabelWithHeight(lblAppVersion.get(), roundToInt(lblAppName->getHeight() * 0.75f));
     lblAppVersion->setTopLeftPosition(lblAppName->getRight(), lblAppName->getBottom() - lblAppVersion->getHeight());
 
-    juce::Rectangle<int> lumatoneBounds = allKeysOverview->getLocalGraphicBounds().translated(allKeysOverview->getX(), allKeysOverview->getY());
+    juce::Rectangle<int> lumatoneBounds = allKeysOverview->getLocalBounds().translated(allKeysOverview->getX(), allKeysOverview->getY());
     lblFirmwareVersion->setBounds(lumatoneBounds.getX(), lumatoneBounds.getBottom(), contentWidth, juce::roundToInt((float)btnHeight * 0.7f));
 }
 
@@ -474,7 +478,9 @@ void MainContentComponent::handleStatePropertyChange(juce::ValueTree stateIn, co
     }
     else if (property == LumatoneApplicationProperty::NumKeySelected)
     {
-        lblSelectedKeys->setText(stateIn[property].toString() + " Keys Selected", juce::NotificationType::dontSendNotification);
+        juce::String append = stateIn[property].toString() == "1" ? " Key" : " Keys";
+        append += " Selected";
+        lblSelectedKeys->setText(stateIn[property].toString() + append, juce::NotificationType::dontSendNotification);
     }
     else if (property == LumatoneStateProperty::LastConnectedFirmwareVersion)
     {
@@ -482,5 +488,9 @@ void MainContentComponent::handleStatePropertyChange(juce::ValueTree stateIn, co
         lblFirmwareVersion->setText(string, juce::NotificationType::sendNotification);
 
         requestDeviceGlobalSettings();
+    }
+    else if (property == LumatoneEditorProperty::ShowKeyProperties)
+    {
+        allKeysOverview->setShowKeyProperties((bool)stateIn[property]);
     }
 }

@@ -44,25 +44,37 @@ public:
     LumatoneColourModel();
     ~LumatoneColourModel();
 
+    juce::String getName() const { return name; }
+    LumatoneColourModel::Type getType() const { return currentType; }
+
+    void setType(Type typeIn);
+
     juce::Colour getModelColour(juce::Colour colour);
 
     // LumatoneColour getLumatoneColour(juce::Colour colour);
 
 private:
 
-    juce::Colour calculateModelColour(LumatoneColourModel::Type type, const juce::Colour& colour);
+    juce::Colour calculateModelColour(const juce::Colour& colour);
 
     void readTable(const juce::var& tableVar, ColourTable& table);
 
+    TrilinearInterpolationParams getInterpolationParams(const juce::Colour& c);
+
+protected:
+
     void parseTable();
 
-    TrilinearInterpolationParams getInterpolationParams(LumatoneColourModel::Type type, const juce::Colour& c);
-
 private:
+    juce::String name;
+
     int increment = MAX_INCREMENT;
 
     ColourTable raw;
     ColourTable adjusted;
+
+    Type currentType;
+    ColourTable* currentTable;
 
     std::unique_ptr<juce::HashMap<LumatoneEditor::ColourHash,juce::Colour>> cache;
 };

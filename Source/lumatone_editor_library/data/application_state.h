@@ -43,6 +43,8 @@ namespace LumatoneApplicationProperty
 
     static const juce::Identifier LayoutContextIsSetId = juce::Identifier("LayoutContextIsSetId");
 
+    static const juce::Identifier ColourMode = juce::Identifier("ColourMode");
+
     // Settings
     // static const juce::Identifier DefaultMappingsDirectory = juce::Identifier("DefaultMappingsDirectory");
     // static const juce::Identifier LastMappingsDirectory = juce::Identifier("LastMappingsDirectory");
@@ -58,6 +60,15 @@ class DeviceActivityMonitor;
 
 class LumatoneApplicationState : public LumatoneState
 {
+public:
+
+    enum class ColourModes
+    {
+        None = 0,
+        RGB = 1,
+        ModelAdjusted = 2
+    };
+
 public:
     // Top-level constructor
     LumatoneApplicationState(juce::ValueTree stateIn, LumatoneFirmwareDriver& driverIn, juce::UndoManager* undoManager);
@@ -194,6 +205,8 @@ public:
         void addKeyToSelection(int keyNum);
         void removeKeyFromSelection(int keyNum);
         void clearSelectedKeys();
+
+        void setColourMode(ColourModes mode);
 
     protected:
         void updatedSelectedKeys();

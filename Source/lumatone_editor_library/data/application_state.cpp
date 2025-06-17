@@ -573,6 +573,27 @@ void LumatoneApplicationState::Controller::clearSelectedKeys()
     getEditorListeners()->call(&LumatoneEditor::EditorListener::selectionChanged);
 }
 
+void LumatoneApplicationState::Controller::setColourMode(ColourModes mode)
+{
+    switch (mode)
+    {
+    case ColourModes::None:
+        appState.setStateProperty(LumatoneApplicationProperty::ColourMode, "");
+        break;
+    case ColourModes::RGB:
+        appState.setStateProperty(LumatoneApplicationProperty::ColourMode, "RGB");
+        break;
+
+    default:
+    case ColourModes::ModelAdjusted:
+        appState.setStateProperty(LumatoneApplicationProperty::ColourMode, "ModelAdjusted");
+        appState.colourModel->setType(LumatoneColourModel::Type::ADJUSTED);
+        break;
+
+    // TODO raw/other adjustments
+    }
+}
+
 void LumatoneApplicationState::Controller::updatedSelectedKeys()
 {
     juce::Array<MappedLumatoneKey> updatedKeys;

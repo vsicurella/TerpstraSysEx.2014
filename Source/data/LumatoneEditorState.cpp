@@ -275,6 +275,12 @@ void LumatoneEditorState::Controller::setWindowState(const juce::Rectangle<int> 
     editorState.setStateProperty(LumatoneEditorProperty::MainWindowBounds, windowBounds.toString());
 }
 
+void LumatoneEditorState::Controller::toggleKeyProperties()
+{
+    bool toggled = !editorState.getBoolProperty(LumatoneEditorProperty::ShowKeyProperties, false);
+    editorState.setStateProperty(LumatoneEditorProperty::ShowKeyProperties, toggled);
+}
+
 juce::ValueTree LumatoneEditorState::loadStateProperties(juce::ValueTree stateIn)
 {
     juce::ValueTree newState = (stateIn.hasType(LumatoneEditorProperty::StateTree))

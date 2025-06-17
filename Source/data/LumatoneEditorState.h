@@ -71,6 +71,8 @@ namespace LumatoneEditorProperty
     static const juce::Identifier LastSettingsPanel = juce::Identifier("LastSettingsPanel");
     static const juce::Identifier LastColourWindowTab = juce::Identifier("LastColourWindowTab");
     static const juce::Identifier LastFirmwareBinPath = juce::Identifier("LastFirmwareBinPath");
+
+    static const juce::Identifier ShowKeyProperties = juce::Identifier("ShowKeyProperties");
 }
 
 enum class EditorMode
@@ -255,6 +257,8 @@ public:
         void setBatchColourTempShift(float value);
 
         void setWindowState(const juce::Rectangle<int>& windowBounds, juce::String stateString);
+
+        void toggleKeyProperties();
 
     private:
         LumatoneEditorState& editorState;

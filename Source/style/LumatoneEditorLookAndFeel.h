@@ -1118,6 +1118,13 @@ public:
                 g.drawRect(colourArea);
             }
         }
+
+        if (item.isTicked)
+        {
+            g.setColour(textColour);
+            g.setFont(font);
+            g.drawFittedText("*", textArea, juce::Justification::centredRight, 1);
+        }
     }
 
     void getIdealPopupMenuItemSizeWithOptions(const juce::String& text, bool isSeparator, int standardMenuItemHeight, int& idealWidth, int& idealHeight,

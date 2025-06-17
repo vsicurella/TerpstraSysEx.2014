@@ -61,7 +61,7 @@ public:
 
     void setSelected(bool selected);
 
-    void setShowMidiInfo(bool showInfo, bool onlySelected);
+    void setShowMidiInfo(bool showInfo);
 
     bool selected() const { return isSelected; }
     bool clicked() const { return isClicked; }
@@ -106,8 +106,7 @@ private:
 
     juce::Rectangle<float> selectBounds;
 
-    bool showMidiInfo = true;
-    bool showOnlySelectedInfo = true;
+    bool showMidiInfo = false;
 
     const float selectedDotScalar = 0.15f;
 

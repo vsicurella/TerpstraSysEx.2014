@@ -58,6 +58,8 @@ public:
     LumatoneKeyboardComponent::UiMode getUiMode() const { return uiMode; }
     void setUiMode(LumatoneKeyboardComponent::UiMode modeIn);
 
+    void setShowKeyProperties(bool showProps);
+
 public:
 
     juce::Rectangle<int> getLocalGraphicBounds() const;
@@ -101,6 +103,8 @@ private:
 //     void addListener(LumatoneKeyboardComponent::Listener* listenerIn) { listeners.add(listenerIn); }
 //     void removeListener(LumatoneKeyboardComponent::Listener* listenerIn) { listeners.remove(listenerIn); }
 
+    virtual void handleStatePropertyChange(juce::ValueTree stateIn, const juce::Identifier& property) override;
+
 protected:
 
     LumatoneKeyDisplay* getKeyFromMouseEvent(const juce::MouseEvent& e);
@@ -142,7 +146,6 @@ private:
     void handleAftertouch(int midiChannel, int midiNote, juce::uint8 aftertouch) override { }
     void handleController(int midiChannel, int midiNote, juce::uint8 value) override { }
 
-
 private:
 
     void rerender();
@@ -172,6 +175,11 @@ private:
     LumatoneKeyboardComponent::UiMode   uiMode = LumatoneKeyboardComponent::UiMode::Perform;
 
     juce::Array<MappedLumatoneKey>      lastKeySelection;
+
+    //==============================================================================
+    // Preferences
+
+    bool showMidiInfo = false;
 
     //==============================================================================
     // UI Data

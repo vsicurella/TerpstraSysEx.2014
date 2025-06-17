@@ -187,6 +187,22 @@ void LumatoneKeyboardComponent::setUiMode(LumatoneKeyboardComponent::UiMode mode
     uiMode = modeIn;
 }
 
+void LumatoneKeyboardComponent::setShowKeyProperties(bool showProps)
+{
+    if (showMidiInfo != showProps)
+    {
+        showMidiInfo = showProps;
+        for (auto& board : octaveBoards)
+        {
+            for (auto& key : board->keyMiniDisplay)
+            {
+                key->setShowMidiInfo(showProps);
+            }
+        }
+    }
+
+}
+
 juce::Rectangle<int> LumatoneKeyboardComponent::getLocalGraphicBounds() const
 {
     return lumatoneBounds;
@@ -326,6 +342,7 @@ void LumatoneKeyboardComponent::updateSelectedKeys(const juce::Array<MappedLumat
 
         const OctaveBoard* board = octaveBoards.getUnchecked(mappedKey.boardIndex);
         board->keyMiniDisplay.getUnchecked(mappedKey.keyIndex)->setSelected(false);
+        board->keyMiniDisplay.getUnchecked(mappedKey.keyIndex)->setShowMidiInfo(showMidiInfo);
     }
 
     for (const MappedLumatoneKey& mappedKey : newSelection)
@@ -344,6 +361,7 @@ void LumatoneKeyboardComponent::updateSelectedKeys(const juce::Array<MappedLumat
 
         const OctaveBoard* board = octaveBoards.getUnchecked(mappedKey.boardIndex);
         board->keyMiniDisplay.getUnchecked(mappedKey.keyIndex)->setSelected(true);
+        board->keyMiniDisplay.getUnchecked(mappedKey.keyIndex)->setShowMidiInfo(true);
     }
 
     lastKeySelection.clearQuick();
@@ -426,6 +444,31 @@ void LumatoneKeyboardComponent::updateKeyState(int boardIndex, int keyIndex, boo
             keyComponent->noteOn();
         else
             keyComponent->noteOff();
+    }
+}
+
+void LumatoneKeyboardComponent::handleStatePropertyChange(juce::ValueTree stateIn, const juce::Identifier& property)
+{
+    LumatoneApplicationState::handleStatePropertyChange(stateIn, property);
+
+    if (property == LumatoneApplicationProperty::ColourMode)
+    {
+        juce::String mode = stateIn[property].toString();
+        for (int b = 0; b < getNumBoards(); b++)
+        {
+            OctaveBoard* board = octaveBoards.getUnchecked(b);
+            for (int k = 0; k < getOctaveBoardSize(); k++)
+            {
+                LumatoneKey key = getKey(b, k);
+                juce::Colour colour = key.getColour();
+                if (mode == "None" || mode == "ModelAdjusted")
+                {
+                    colour = getColourModel()->getModelColour(colour);
+                }
+
+                board->keyMiniDisplay.getUnchecked(k)->setLumatoneKey(key, colour);
+            }
+        }
     }
 }
 

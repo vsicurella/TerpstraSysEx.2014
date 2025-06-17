@@ -107,7 +107,7 @@ void LumatoneKeyDisplay::paint(juce::Graphics& g)
         g.fillEllipse(selectBounds);
     }
 
-    if (showMidiInfo && (isSelected && showOnlySelectedInfo) || !showOnlySelectedInfo)
+    if (showMidiInfo)
     {
         g.setColour(juce::Colour(0xff333333));
         g.drawFittedText(juce::String(getMidiChannel()), channelNumberArea, juce::Justification::centred, 1);
@@ -265,6 +265,7 @@ void LumatoneKeyDisplay::setLumatoneKey(const LumatoneKey &lumatoneKey, juce::Co
 {
     LumatoneKey::operator=(lumatoneKey);
     LumatoneKey::setColour(displayColour);
+    repaint();
 }
 
 void LumatoneKeyDisplay::setSelected(bool selected)
@@ -276,11 +277,10 @@ void LumatoneKeyDisplay::setSelected(bool selected)
     repaintIfInteractive();
 }
 
-void LumatoneKeyDisplay::setShowMidiInfo(bool showInfo, bool onlyShowSelected)
+void LumatoneKeyDisplay::setShowMidiInfo(bool showInfo)
 {
     showMidiInfo = showInfo;
-    showOnlySelectedInfo = onlyShowSelected;
-    resized();
+    repaint();
 }
 
 void LumatoneKeyDisplay::clearUiState()

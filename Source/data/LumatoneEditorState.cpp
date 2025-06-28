@@ -16,6 +16,9 @@
 #include "../lumatone_editor_library/listeners/editor_listener.h"
 #include "../lumatone_editor_library/palettes/colour_selection_group.h"
 
+#include "../actions/EditorControlActions.h"
+#include "../actions/KeySelectionControlActions.h"
+
 static juce::File getDefaultUserDocumentsDirectory()
 {
     return File::getSpecialLocation(File::userDocumentsDirectory).getChildFile("Lumatone Editor");
@@ -228,6 +231,12 @@ void LumatoneEditorState::Controller::setEditMode(EditorMode editMode)
     editorState.setStateProperty(LumatoneEditorProperty::EditorMode, (int)editorState.editorMode);
 }
 
+void LumatoneEditorState::Controller::setMouseMode(LumatoneEditor::MouseMode mouseMode)
+{
+    editorState.mouseMode = mouseMode;
+    editorState.setStateProperty(LumatoneEditorProperty::MouseMode, (int)editorState.mouseMode);
+}
+
 void LumatoneEditorState::Controller::setAssignKeyColour(bool set, juce::Colour colourIn)
 {
     editorState.editSelectionState.setKeyColour(set, colourIn);
@@ -251,6 +260,18 @@ void LumatoneEditorState::Controller::setAssignKeyChannel(bool set, int channelI
 void LumatoneEditorState::Controller::setAssignCCFader(bool set, bool ccFaderDefaultIn)
 {
     editorState.editSelectionState.setCCFader(set, ccFaderDefaultIn);
+}
+
+void LumatoneEditorState::Controller::setIncrementNotes(bool incrementNotes)
+{
+    editorState.incrementNotesMode = incrementNotes;
+    editorState.setStateProperty(LumatoneEditorProperty::AutoIncNoteActive, incrementNotes);
+}
+
+void LumatoneEditorState::Controller::setChannelsIncrementPerNotes(int notesPerChannel)
+{
+    editorState.incrementChannelEvery = notesPerChannel;
+    editorState.setStateProperty(LumatoneEditorProperty::AutoIncChannelAfterNumNotes, notesPerChannel);
 }
 
 void LumatoneEditorState::Controller::setBatchColourBrightness(float value)
@@ -279,6 +300,76 @@ void LumatoneEditorState::Controller::toggleKeyProperties()
 {
     bool toggled = !editorState.getBoolProperty(LumatoneEditorProperty::ShowKeyProperties, false);
     editorState.setStateProperty(LumatoneEditorProperty::ShowKeyProperties, toggled);
+}
+
+bool LumatoneEditorState::Controller::DoEditKeyDownAction(LumatoneKeyCoord keyCoord, juce::ModifierKeys mods)
+{
+    bool keyIsSelected = editorState.isKeySelected(keyCoord);
+
+    if (mods.isCommandDown())
+    {
+        if (editorState.mouseMode == LumatoneEditor::MouseMode::SELECT)
+            return performAction(new AddOrRemoveKeySelectionAction(editorState, editorState.getMappingData()->keyCoordToKeyNum(keyCoord), keyIsSelected));
+    }
+    else
+    {
+        // Select mode allows toggling a selected key
+        // But assign mode selects a key, updates it, but does not deselect on another click
+
+        if (editorState.mouseMode == LumatoneEditor::MouseMode::SELECT)
+        {
+            juce::Array<MappedLumatoneKey> keySelection;
+            if (!keyIsSelected)
+            {
+                keySelection.add(MappedLumatoneKey(editorState.getKey(keyCoord), keyCoord));
+            }
+
+            performAction(new SetKeySelectionAction(editorState, keySelection));
+        }
+        else if (!keyIsSelected)
+        {
+            juce::Array<MappedLumatoneKey> keySelection;
+            keySelection.add(MappedLumatoneKey(editorState.getKey(keyCoord), keyCoord));
+            performAction(new SetKeySelectionAction(editorState, keySelection));
+        }
+
+        if (editorState.mouseMode == LumatoneEditor::MouseMode::ASSIGN)
+        {
+            auto keySelection = editorState.getSelectedKeys()->getLast();
+            jassert(keySelection.keyIndex >= 0);
+
+            auto selectionData = editorState.editSelectionState.getData();
+
+            if (editorState.incrementNotesMode)
+            {
+                // Increment note/channel
+                int note = selectionData.note + 1;
+                int channel = selectionData.channel;
+
+                // Auto increment channel
+                if (editorState.incrementChannelEvery > 0 && note >= editorState.incrementChannelEvery)
+                {
+                    note = 0;
+                    channel++;
+                    if (channel > 16)
+                        channel = 1;
+                }
+
+                if (note > 127)
+                    note = 0;
+
+                selectionData.note = note;
+                selectionData.channel = channel;
+                performAction(new SetKeySettingsAction(editorState, selectionData), true, true);
+            }
+
+            // Assign new values - TODO might want to fine tune how the new actions are queued here
+            bool assignIsNewAction = keyIsSelected && !editorState.incrementNotesMode;
+            return performAction(new ApplyAssignmentsToSelectionAction(editorState, selectionData, keySelection), true, assignIsNewAction);
+        }
+    }
+
+    return false;
 }
 
 juce::ValueTree LumatoneEditorState::loadStateProperties(juce::ValueTree stateIn)
@@ -310,9 +401,21 @@ void LumatoneEditorState::handleStatePropertyChange(juce::ValueTree stateIn, con
     {
         windowBounds = juce::Rectangle<int>::fromString(stateIn[property].toString());
     }
-    if (property == LumatoneEditorProperty::HasChangesToSave)
+    else if (property == LumatoneEditorProperty::MouseMode)
     {
-        hasChangesToSave = (bool)stateIn[property];
+        mouseMode = LumatoneEditor::MouseMode((int)stateIn[property]);
+    }
+    else if (property == LumatoneEditorProperty::EditorMode)
+    {
+        editorMode = EditorMode((int)stateIn[property]);
+    }
+    else if (property == LumatoneEditorProperty::AutoIncNoteActive)
+    {
+        incrementNotesMode = (bool)stateIn[property];
+    }
+    else if (property == LumatoneEditorProperty::AutoIncChannelAfterNumNotes)
+    {
+        incrementChannelEvery = (int)stateIn[property];
     }
     else if (property == LumatoneEditorProperty::HasChangesToSend)
     {
@@ -334,9 +437,9 @@ void LumatoneEditorState::handleStatePropertyChange(juce::ValueTree stateIn, con
     {
         inDeveloperMode = (bool)stateIn[property];
     }
-    else if (property == LumatoneEditorProperty::EditorMode)
+    else if (property == LumatoneEditorProperty::HasChangesToSave)
     {
-        editorMode = EditorMode((int)stateIn[property]);
+        hasChangesToSave = (bool)stateIn[property];
     }
 }
 

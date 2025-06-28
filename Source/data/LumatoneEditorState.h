@@ -57,13 +57,16 @@ namespace LumatoneEditorProperty
 
     static const juce::Identifier EditorMode = juce::Identifier("EditorMode");
 
+    static const juce::Identifier MouseMode = juce::Identifier("MouseMode");
+
+    static const juce::Identifier AutoIncNoteActive = juce::Identifier("SingleNoteAutoIncNoteActive");
+    // static const juce::Identifier AutoIncChannelActive = juce::Identifier("SingleNoteAutoIncChannelActive");
+    static const juce::Identifier AutoIncChannelAfterNumNotes = juce::Identifier("SingleNoteAutoIncChannelAfterNumNotes");
+
     // static const juce::Identifier SingleNoteNoteSetActive = juce::Identifier("SingleNoteNoteSetActive");
     // static const juce::Identifier SingleNoteChannelSetActive = juce::Identifier("SingleNoteChannelSetActive");
     // static const juce::Identifier SingleNoteColourSetActive = juce::Identifier("SingleNoteColourSetActive");
     // static const juce::Identifier SingleNoteKeyTypeSetActive = juce::Identifier("SingleNoteKeyTypeSetActive");
-    // static const juce::Identifier SingleNoteAutoIncNoteActive = juce::Identifier("SingleNoteAutoIncNoteActive");
-    // static const juce::Identifier SingleNoteAutoIncChannelActive = juce::Identifier("SingleNoteAutoIncChannelActive");
-    // static const juce::Identifier SingleNoteAutoIncChannelAfterNumNotes = juce::Identifier("SingleNoteAutoIncChannelAfterNumNotes");
     // static const juce::Identifier SingleNoteCCFaderIsDefault = juce::Identifier("SingleNoteCCFaderIsDefault");
 
     // static const juce::Identifier IsomorphicMassAssign = juce::Identifier("IsomorphicMassAssign");
@@ -122,6 +125,9 @@ public:
     bool inSelectMode() const { return mouseMode == LumatoneEditor::MouseMode::SELECT; }
     bool inAssignMode() const { return mouseMode == LumatoneEditor::MouseMode::ASSIGN; }
 
+    bool isIncrementingNotes() const { return incrementNotesMode; }
+    int isIncrementingChannelsAfterNumNotes() const { return incrementChannelEvery; }
+
     // juce::Array<LumatoneKey> getSelectedKeys() const;
 
     LumatoneKeyPropertyData getEditSelectionData() const;
@@ -173,7 +179,10 @@ protected:
 	bool firmwareUpdateWasPerformed = false;
 
     EditorMode editorMode = EditorMode::OFFLINE;
-    LumatoneEditor::MouseMode mouseMode = LumatoneEditor::MouseMode::SELECT;
+    LumatoneEditor::MouseMode mouseMode = LumatoneEditor::MouseMode::ASSIGN;
+
+    bool incrementNotesMode = false;
+    int incrementChannelEvery = 0;
 
     LumatoneEditSelectionState editSelectionState;
     LumatoneEditorBatchColourState batchColourState;
@@ -245,12 +254,16 @@ public:
         void setCalibrationMode(bool calibrationModeOn);
         void setDeveloperMode(bool developerModeOn);
         void setEditMode(EditorMode editMode);
+        void setMouseMode(LumatoneEditor::MouseMode mouseMode);
 
         void setAssignKeyColour(bool set, juce::Colour colourIn);
         void setAssignKeyType(bool set, LumatoneKeyType typeIn);
         void setAssignKeyNote(bool set, int noteIn);
         void setAssignKeyChannel(bool set, int channelIn);
         void setAssignCCFader(bool set, bool ccFaderDefaultIn);
+
+        void setIncrementNotes(bool incrementNotes);
+        void setChannelsIncrementPerNotes(int notesPerChannel);
 
         void setBatchColourBrightness(float value);
         void setBatchColourHueShift(float value);
@@ -259,6 +272,11 @@ public:
         void setWindowState(const juce::Rectangle<int>& windowBounds, juce::String stateString);
 
         void toggleKeyProperties();
+
+    // Helpers for specific actions
+    // public:
+        virtual bool DoEditKeyDownAction(LumatoneKeyCoord keyCoord, juce::ModifierKeys mods=juce::ModifierKeys());
+
 
     private:
         LumatoneEditorState& editorState;

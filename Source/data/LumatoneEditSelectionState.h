@@ -56,6 +56,7 @@ public:
     virtual ~LumatoneEditSelectionState() override { };
 
     LumatoneKeyPropertyData getData() const { return data; }
+    const LumatoneKeyPropertyData& readData() const { return data; }
 
     void setKeyColour(bool set, juce::Colour colourIn);
     void setKeyType(bool set, LumatoneKeyType typeIn);

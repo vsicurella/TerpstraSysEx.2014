@@ -18,25 +18,6 @@ LumatoneEditorKeyboardComponent::~LumatoneEditorKeyboardComponent()
     removeColourSelectionBroadcaster(this);
 }
 
-bool LumatoneEditorKeyboardComponent::isKeySelected(const LumatoneKeyCoord &keyCoord)
-{
-    if (!LumatoneEditorState::getMappingData()->isKeyCoordValid(keyCoord))
-        return false;
-
-    int keyNum = LumatoneEditorState::getMappingData()->keyCoordToKeyNum(keyCoord);
-    for (const MappedLumatoneKey& key : *LumatoneEditorState::getSelectedKeys())
-    {
-        int selectedNum = LumatoneEditorState::getMappingData()->keyCoordToKeyNum(key.boardIndex, key.keyIndex);
-        if (selectedNum == keyNum)
-        {
-            return true;
-            break;
-        }
-    }
-
-    return false;
-}
-
 void LumatoneEditorKeyboardComponent::mouseMove(const juce::MouseEvent &e)
 {
     LumatoneKeyboardComponent::mouseMove(e);
@@ -47,29 +28,10 @@ void LumatoneEditorKeyboardComponent::mouseDown(const juce::MouseEvent &e)
     auto key = getKeyFromMouseEvent(e);
     if (key)
     {
-        LumatoneKeyCoord keyCoord = key->getKeyCoord();
-        bool keyIsSelected = isKeySelected(keyCoord);
-
         LumatoneKeyboardComponent::mouseDownInternal(e, key);
 
-        if (e.mods.isCommandDown())
-        {
-            performAction(new AddOrRemoveKeySelectionAction(*this, LumatoneEditorState::getMappingData()->keyCoordToKeyNum(keyCoord), keyIsSelected));
-        }
-        else
-        {
-            juce::Array<MappedLumatoneKey> keySelection;
-            if (LumatoneEditorState::getSelectedKeys()->size() > 1 || !keyIsSelected)
-            {
-                keySelection.add(MappedLumatoneKey(LumatoneEditorState::getKey(keyCoord), keyCoord));
-            }
-
-            if (performAction(new SetKeySelectionAction(*this, keySelection)))
-            {
-                selectedColour = getEditSelectionData().colour;
-                selectorListeners.call(&ColourSelectionListener::colourChangedCallback, this, selectedColour);
-            }
-        }
+        LumatoneKeyCoord keyCoord = key->getKeyCoord();
+        LumatoneEditorState::Controller::DoEditKeyDownAction(keyCoord, e.mods);
     }
 }
 
@@ -88,23 +50,15 @@ void LumatoneEditorKeyboardComponent::mouseDrag(const juce::MouseEvent &e)
 void LumatoneEditorKeyboardComponent::mouseDragInternalOnNewKey(const juce::MouseEvent &e, LumatoneKeyDisplay *key)
 {
     LumatoneKeyCoord keyCoord = key->getKeyCoord();
-    bool isSelected = isKeySelected(keyCoord);
+    // bool isSelected = isKeySelected(keyCoord);
 
     bool undoable = true;
     bool newTransaction = !mouseWasDragging;
 
-    if (e.mods.isCommandDown())
+    bool actionDone = DoEditKeyDownAction(keyCoord, e.mods);
+    if (actionDone && !e.mods.isCommandDown())
     {
-        performAction(new AddOrRemoveKeySelectionAction(*this, LumatoneEditorState::getMappingData()->keyCoordToKeyNum(keyCoord), isSelected), undoable, newTransaction);
-    }
-    else
-    {
-        juce::Array<MappedLumatoneKey> keySelection;
-        if (!isSelected)
-        {
-            keySelection.add(MappedLumatoneKey(LumatoneEditorState::getKey(keyCoord), keyCoord));
-        }
-        if (performAction(new SetKeySelectionAction(*this, keySelection), undoable, newTransaction))
+        if (LumatoneEditorState::getSelectedKeys()->size() > 0)
         {
             selectedColour = getEditSelectionData().colour;
             selectorListeners.call(&ColourSelectionListener::colourChangedCallback, this, selectedColour);
@@ -155,6 +109,29 @@ void LumatoneEditorKeyboardComponent::modifierKeysChanged(const juce::ModifierKe
     }
 
     LumatoneKeyboardComponent::modifierKeysChanged(modifiers);
+}
+
+void LumatoneEditorKeyboardComponent::noteOnInternal(int midiChannel, int midiNote, juce::uint8 velocity)
+{
+    // TODO - make optional virtual mapping to make all keys unique, just for software interaction?
+    auto mappedKeyCoords = lumatoneMidiMap.getKeysAssignedToNoteOn(midiChannel, midiNote);
+
+    // If a key results in multiple virtual keys (shares MIDI data) then reset selection, but "hold down" command for subsequent keys
+    bool multiSelect = mappedKeyCoords.size() > 1;
+    ModifierKeys keys;
+
+    for (auto coord : mappedKeyCoords)
+    {
+        if (LumatoneEditorState::getMappingData()->isKeyCoordValid(coord))
+        {
+            // TODO - solve issue for auto increment notes
+            LumatoneEditorState::Controller::DoEditKeyDownAction(coord, keys);
+            updateKeyState(coord.boardIndex, coord.keyIndex, true);
+        }
+
+        if (multiSelect)
+            keys = keys.withFlags(juce::ModifierKeys::commandModifier);
+    }
 }
 
 void LumatoneEditorKeyboardComponent::deselectColour()

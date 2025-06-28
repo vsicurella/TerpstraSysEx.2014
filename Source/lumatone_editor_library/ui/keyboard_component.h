@@ -93,7 +93,7 @@ public:
     void lumatoneKeyDown(int boardIndex, int keyIndex);
     void lumatoneKeyUp(int boardIndex, int keyIndex);
 
-private:
+protected:
     // Playing mode implementations
     void updateKeyState(int boardIndex, int keyIndex, bool keyIsDown);
 
@@ -124,14 +124,14 @@ protected:
     bool keyPressed(const juce::KeyPress& key, juce::Component* originatingComponent) override;
     void modifierKeysChanged(const juce::ModifierKeys& modifiers) override;
 
-private:
+protected:
     // Private implementations of other methods
 
-    void keyDownInternal(int boardIndex, int keyIndex, juce::uint8 velocity);
-    void keyUpInternal(int boardIndex, int keyIndex);
+    virtual void keyDownInternal(int boardIndex, int keyIndex, juce::uint8 velocity);
+    virtual void keyUpInternal(int boardIndex, int keyIndex);
 
-    void noteOnInternal(int midiChannel, int midiNote, juce::uint8 velocity);
-    void noteOffInternal(int midiChannel, int midiNote);
+    virtual void noteOnInternal(int midiChannel, int midiNote, juce::uint8 velocity);
+    virtual void noteOffInternal(int midiChannel, int midiNote);
 
 private:
     // LumatoneMidiState implementations (note callbacks)
@@ -170,8 +170,10 @@ private:
 
     LumatoneRender      lumatoneRender;
 
+protected: // TODO - should this just use LumatoneState::midiKeyMap ?
     LumatoneOutputMap   lumatoneMidiMap;
 
+private:
     LumatoneKeyboardComponent::UiMode   uiMode = LumatoneKeyboardComponent::UiMode::Perform;
 
     juce::Array<MappedLumatoneKey>      lastKeySelection;

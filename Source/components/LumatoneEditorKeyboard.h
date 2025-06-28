@@ -13,8 +13,6 @@ public:
     LumatoneEditorKeyboardComponent(const LumatoneEditorState& stateIn);
     ~LumatoneEditorKeyboardComponent() override;
 
-    bool isKeySelected(const LumatoneKeyCoord& keyCoord);
-
 protected:
 
     // juce::Component UI implementations
@@ -28,6 +26,11 @@ private:
     bool keyStateChanged(bool isKeyDown) override;
     bool keyPressed(const juce::KeyPress& key, juce::Component* originatingComponent) override;
     void modifierKeysChanged(const juce::ModifierKeys& modifiers) override;
+
+private:
+
+    void noteOnInternal(int midiChannel, int midiNote, juce::uint8 velocity) override;
+    // void noteOffInternal(int midiChannel, int midiNote) override;
 
 protected:
 

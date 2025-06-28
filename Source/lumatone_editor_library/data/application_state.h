@@ -92,7 +92,8 @@ public:
 
     // App Methods
     const juce::Array<MappedLumatoneKey>* getSelectedKeys() const;
-    void updateSelecetdKeys();
+    bool isKeySelected(const LumatoneKeyCoord& keyCoord);
+    bool isAnyKeySelected() const { return selectedKeys->size() > 0; }
 
     // Context Methods
     bool isContextSet() const { return contextIsSet; }
@@ -156,8 +157,8 @@ public:
     void addEditorListener(LumatoneEditor::EditorListener* listenerIn);
     void removeEditorListener(LumatoneEditor::EditorListener* listenerIn);
 
-private:
-    std::shared_ptr<juce::ListenerList<LumatoneEditor::MidiListener>> midiListeners;
+// private:
+    // std::shared_ptr<juce::ListenerList<LumatoneEditor::MidiListener>> midiListeners;
 public:
     void addMidiListener(LumatoneEditor::MidiListener* listenerIn);
     void removeMidiListener(LumatoneEditor::MidiListener* listenerIn);
@@ -222,7 +223,7 @@ public:
         juce::ListenerList<LumatoneEditor::EditorListener>* getEditorListeners() const { return appState.editorListeners.get(); }
         juce::ListenerList<LumatoneEditor::StatusListener>* getStatusListeners() const { return appState.statusListeners.get(); }
         juce::ListenerList<LumatoneEditor::FirmwareListener>* getFirmwareListeners() const { return appState.firmwareListeners.get(); }
-        juce::ListenerList<LumatoneEditor::MidiListener>* getMidiListeners() const { return appState.midiListeners.get(); }
+        // juce::ListenerList<LumatoneEditor::MidiListener>* getMidiListeners() const { return appState.midiListeners.get(); }
 
     private:
         static void updateSelectionState(LumatoneApplicationState& stateIn, const juce::Array<MappedLumatoneKey>& selection);

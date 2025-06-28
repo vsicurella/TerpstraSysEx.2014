@@ -31,7 +31,7 @@ LumatoneApplicationState::LumatoneApplicationState(juce::ValueTree stateIn, Luma
     editorListeners = std::make_shared<juce::ListenerList<LumatoneEditor::EditorListener>>();
     statusListeners = std::make_shared<juce::ListenerList<LumatoneEditor::StatusListener>>();
     firmwareListeners = std::make_shared<juce::ListenerList<LumatoneEditor::FirmwareListener>>();
-    midiListeners = std::make_shared<juce::ListenerList<LumatoneEditor::MidiListener>>();
+    // midiListeners = std::make_shared<juce::ListenerList<LumatoneEditor::MidiListener>>();
 
     selectedKeys = std::make_shared<juce::Array<MappedLumatoneKey>>();
 
@@ -54,7 +54,7 @@ LumatoneApplicationState::LumatoneApplicationState(juce::String nameIn, const Lu
     , editorListeners(stateIn.editorListeners)
     , statusListeners(stateIn.statusListeners)
     , firmwareListeners(stateIn.firmwareListeners)
-    , midiListeners(stateIn.midiListeners)
+    // , midiListeners(stateIn.midiListeners)
     , selectedKeys(stateIn.selectedKeys)
     , receiveSettingsStatus(stateIn.receiveSettingsStatus)
     , receiveLayoutStatus(stateIn.receiveLayoutStatus)
@@ -81,7 +81,7 @@ LumatoneApplicationState::~LumatoneApplicationState()
     layoutContext = nullptr;
     receiveLayoutStatus = nullptr;
     receiveSettingsStatus = nullptr;
-    midiListeners = nullptr;
+    // midiListeners = nullptr;
     firmwareListeners = nullptr;
     statusListeners = nullptr;
     editorListeners = nullptr;
@@ -115,6 +115,25 @@ bool LumatoneApplicationState::doSendChangesToDevice() const
 const juce::Array<MappedLumatoneKey> *LumatoneApplicationState::getSelectedKeys() const
 {
     return selectedKeys.get();
+}
+
+bool LumatoneApplicationState::isKeySelected(const LumatoneKeyCoord &keyCoord)
+{
+    if (!getMappingData()->isKeyCoordValid(keyCoord))
+        return false;
+
+    int keyNum = getMappingData()->keyCoordToKeyNum(keyCoord);
+    for (const MappedLumatoneKey& key : *getSelectedKeys())
+    {
+        int selectedNum = getMappingData()->keyCoordToKeyNum(key.boardIndex, key.keyIndex);
+        if (selectedNum == keyNum)
+        {
+            return true;
+            break;
+        }
+    }
+
+    return false;
 }
 
 LumatoneController *LumatoneApplicationState::getLumatoneController() const
@@ -653,12 +672,14 @@ void LumatoneApplicationState::removeFirmwareListener(LumatoneEditor::FirmwareLi
 
 void LumatoneApplicationState::addMidiListener(LumatoneEditor::MidiListener* listenerIn)
 {
-    midiListeners->add(listenerIn);
+    controller->addMidiListener(listenerIn);
+    // midiListeners->add(listenerIn);
 }
 
 void LumatoneApplicationState::removeMidiListener(LumatoneEditor::MidiListener* listenerIn)
 {
-    midiListeners->remove(listenerIn);
+    controller->removeMidiListener(listenerIn);
+    // midiListeners->remove(listenerIn);
 }
 
 bool LumatoneApplicationState::Controller::requestCompleteDeviceConfig()

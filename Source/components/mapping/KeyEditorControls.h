@@ -66,6 +66,9 @@ private:
     void noteInputCallback();
     void channelInputCallback();
 
+    void selectModeCallback();
+    void assignModeCallback();
+
 private:
     std::unique_ptr<juce::Label>            lblKeySettings;
 

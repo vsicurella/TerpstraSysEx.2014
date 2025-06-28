@@ -222,6 +222,7 @@ void KeyEditorControls::resized()
     // multiSelectControls->setBounds(w - selectionTabBarWidth, headerHeight, selectionTabBarWidth, h - headerHeight);
 }
 
+// TODO NEEDS FIX - this should be coming through editSelectionState
 void KeyEditorControls::selectionChanged()
 {
     // Make more efficient? (each time goes through loop)
@@ -327,13 +328,15 @@ void KeyEditorControls::autoIncrementToggleCallback(bool isToggled)
 {
     if (isToggled)
     {
-        noteAutoIncrInput->setEnabled(true);
-        channelAutoIncrNoteInput->setEnabled(true);
+        // TEMP - TURN MOUSE MODE TO ASSIGN
+        assignModeCallback();
+        performAction(SetEditMode::SetAssignMode(*this, true), true, true);
     }
     else
     {
-        noteAutoIncrInput->setEnabled(false);
-        channelAutoIncrNoteInput->setEnabled(false);
+        // TEMP - TURN MOUSE MODE TO SELECT
+        selectModeCallback();
+        performAction(SetEditMode::SetSelectMode(*this), true, true);
     }
 }
 
@@ -341,7 +344,29 @@ void KeyEditorControls::handleStatePropertyChange(juce::ValueTree stateIn, const
 {
     LumatoneEditorState::handleStatePropertyChange(stateIn, property);
 
-    // juce::var value = stateIn.getProperty(property);
+    juce::var value = stateIn.getProperty(property);
+
+    if (property == LumatoneEditorProperty::MouseMode)
+    {
+        if ((int)stateIn[property] == (int)LumatoneEditor::MouseMode::SELECT)
+        {
+            selectModeCallback();
+        }
+        else
+        {
+            assignModeCallback();
+        }
+    }
+    else if (property == LumatoneEditorProperty::AutoIncNoteActive)
+    {
+        noteAutoIncrInput->setValue((bool)stateIn[property], juce::NotificationType::dontSendNotification);
+    }
+    else if (property == LumatoneEditorProperty::AutoIncChannelAfterNumNotes)
+    {
+        int channel = (int)stateIn[property];
+        if (channel > 0)
+            channelAutoIncrNoteInput->setValue(channel, juce::NotificationType::dontSendNotification);
+    }
 
     // if (property == LumatoneEditSelectionProperty::AssignKeyColour)
     // {
@@ -400,6 +425,7 @@ void KeyEditorControls::deselectColour()
 
 void KeyEditorControls::colorInputCallback()
 {
+    // juce::Colour newColour = colourInputBox->getColourValue();
     performAction(SetKeySettingsAction::NewSetAssignColourAction(*this, colourInputBox->getColourValue()));
 }
 
@@ -408,7 +434,7 @@ void KeyEditorControls::typeInputCallback()
     LumatoneKeyType newType = LumatoneKeyType(keyTypeCombo->getValue() + 1);
     performAction(SetKeySettingsAction::NewSetAssignKeyTypeAction(*this, newType));
 
-    if (keyTypeCombo->getValue() == 0)
+    if (keyTypeCombo->getValue() == 0 || !isAnyKeySelected())
         return;
 
     LumatoneKeyPropertyData assignData;
@@ -420,7 +446,7 @@ void KeyEditorControls::typeInputCallback()
 void KeyEditorControls::noteInputCallback()
 {
     performAction(SetKeySettingsAction::NewSetAssignKeyNoteAction(*this, (int)noteInput->getValue()));
-    if (noteInput->isValueNull())
+    if (noteInput->isValueNull() || !isAnyKeySelected())
         return;
 
     LumatoneKeyPropertyData assignData;
@@ -432,13 +458,25 @@ void KeyEditorControls::noteInputCallback()
 void KeyEditorControls::channelInputCallback()
 {
     performAction(SetKeySettingsAction::NewSetAssignKeyChannelAction(*this, (int)channelInput->getValue()));
-    if (channelInput->isValueNull())
+    if (channelInput->isValueNull() || !isAnyKeySelected())
         return;
 
     LumatoneKeyPropertyData assignData;
     assignData.useChannel = true;
     assignData.channel = (int)channelInput->getValue();
     performAction(new ApplyAssignmentsToSelectionAction(*this, assignData, *getSelectedKeys()), true, false);
+}
+
+void KeyEditorControls::selectModeCallback()
+{
+    noteAutoIncrInput->setEnabled(false);
+    channelAutoIncrNoteInput->setEnabled(false);
+}
+
+void KeyEditorControls::assignModeCallback()
+{
+    noteAutoIncrInput->setEnabled(true);
+    channelAutoIncrNoteInput->setEnabled(true);
 }
 
 // void KeyEditorControls::changeListenerCallback(juce::ChangeBroadcaster *source)

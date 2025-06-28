@@ -61,3 +61,8 @@ private:
 
 
 #endif // LUMATONE_SELECTION_CONTROL_ACTIONS_H
+
+static juce::Colour getColourFromSelectedKeys(const juce::Array<MappedLumatoneKey> *selectedKeys);
+static LumatoneKeyType getTypeFromSelectedKeys(const juce::Array<MappedLumatoneKey> *selectedKeys);
+static int getNoteFromSelectedKeys(const juce::Array<MappedLumatoneKey> *selectedKeys);
+static int getChannelFromSelectedKeys(const juce::Array<MappedLumatoneKey> *selectedKeys);

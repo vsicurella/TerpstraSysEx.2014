@@ -4,10 +4,40 @@ static juce::Colour getColourFromSelectedKeys(const juce::Array<MappedLumatoneKe
 {
     if (selectedKeys->size() > 0)
     {
-        return selectedKeys->getUnchecked(0).getColour();
+        return selectedKeys->getUnchecked(selectedKeys->size() - 1).getColour();
     }
 
     return juce::Colour();
+}
+
+static LumatoneKeyType getTypeFromSelectedKeys(const juce::Array<MappedLumatoneKey>* selectedKeys)
+{
+    if (selectedKeys->size() > 0)
+    {
+        return selectedKeys->getUnchecked(selectedKeys->size() - 1).getType();
+    }
+
+    return LumatoneKeyType::disabledDefault;
+}
+
+static int getNoteFromSelectedKeys(const juce::Array<MappedLumatoneKey>* selectedKeys)
+{
+    if (selectedKeys->size() > 0)
+    {
+        return selectedKeys->getUnchecked(selectedKeys->size() - 1).getMidiNumber();
+    }
+
+    return -1;
+}
+
+static int getChannelFromSelectedKeys(const juce::Array<MappedLumatoneKey>* selectedKeys)
+{
+    if (selectedKeys->size() > 0)
+    {
+        return selectedKeys->getUnchecked(selectedKeys->size() - 1).getMidiChannel();
+    }
+
+    return -1;
 }
 
 AddOrRemoveKeySelectionAction::AddOrRemoveKeySelectionAction(const LumatoneEditorState &stateIn, int keyNumIn, bool removeIn)
@@ -75,8 +105,19 @@ SetKeySelectionAction::~SetKeySelectionAction()
 bool SetKeySelectionAction::perform()
 {
     setSelectedKeys(newSelection);
+
     juce::Colour newColour = getColourFromSelectedKeys(getSelectedKeys());
     setAssignKeyColour(newColour.isOpaque(), newColour);
+
+    LumatoneKeyType newType = getTypeFromSelectedKeys(getSelectedKeys());
+    setAssignKeyType(newType != LumatoneKeyType::disabledDefault, newType);
+
+    int newNote = getNoteFromSelectedKeys(getSelectedKeys());
+    setAssignKeyNote(newNote >= 0, newNote);
+
+    int newChannel = getChannelFromSelectedKeys(getSelectedKeys());
+    setAssignKeyChannel(newType > 0, newChannel);
+
     return true;
 }
 

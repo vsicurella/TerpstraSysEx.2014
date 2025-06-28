@@ -37,6 +37,14 @@ SetKeySettingsAction::SetKeySettingsAction(const LumatoneEditorState & stateIn,
     newEditData.ccFaderDefault = ccFaderDefaultIn;
 }
 
+SetKeySettingsAction::SetKeySettingsAction(const LumatoneEditorState &stateIn, const LumatoneKeyPropertyData &settingsData)
+    : SetKeySettingsAction(stateIn,
+        settingsData.useColour, settingsData.useType, settingsData.useNote, settingsData.useChannel, settingsData.useCCFaderDefault,
+        settingsData.colour, settingsData.type, settingsData.note, settingsData.channel, settingsData.ccFaderDefault)
+{
+
+}
+
 bool SetKeySettingsAction::perform()
 {
     if (add)
@@ -226,5 +234,38 @@ bool SetCurrentFileAction::undo()
         setCurrentFile(previousFile);
     setCompleteConfig(*previousMappingData);
     setSelectedKeys(previousKeySelection);
+    return true;
+}
+
+SetEditMode::SetEditMode(const LumatoneEditorState& stateIn, LumatoneEditor::MouseMode newMouseMode, bool incrementNotes, int incrementChannelsPerNotes)
+    : LumatoneEditorState(stateIn)
+    , LumatoneEditorState::Controller(static_cast<LumatoneEditorState&>(*this))
+    , LumatoneAction(this, "SetEditMode")
+    , mouseMode(newMouseMode), incrementNotesState(incrementNotes), incrementChannelsState(incrementChannelsPerNotes)
+{
+    lastMouseMode = getMouseMode();
+    lastIncrementNotesState = isIncrementingNotes();
+    lastIncrementChannelsState = isIncrementingChannelsAfterNumNotes();
+}
+
+bool SetEditMode::perform()
+{
+    setMouseMode(mouseMode);
+    setIncrementNotes(incrementNotesState);
+
+    if (incrementChannelsState > 0)
+        setChannelsIncrementPerNotes(incrementChannelsState);
+
+    return true;
+}
+
+bool SetEditMode::undo()
+{
+    setMouseMode(lastMouseMode);
+    setIncrementNotes(lastIncrementNotesState);
+
+    if (incrementChannelsState > 0 && lastIncrementChannelsState > 0)
+        setChannelsIncrementPerNotes(lastIncrementChannelsState);
+
     return true;
 }

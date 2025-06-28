@@ -35,6 +35,8 @@ public:
                        , bool ccFaderDefaultIn = false,
                         bool addToSettings = false);
 
+    SetKeySettingsAction(const LumatoneEditorState& stateIn, const LumatoneKeyPropertyData& settingsData);
+
     bool perform() override;
     bool undo() override;
 
@@ -108,6 +110,39 @@ private:
     juce::File newFile;
     std::shared_ptr<LumatoneLayout> previousMappingData;
     juce::Array<MappedLumatoneKey> previousKeySelection;
+};
+
+class SetEditMode : public LumatoneEditorState
+                    , private LumatoneEditorState::Controller
+                    , public LumatoneAction
+{
+public:
+
+    SetEditMode(const LumatoneEditorState& stateIn, LumatoneEditor::MouseMode mouseMode, bool incrementNotes=false, int incrementChannelsPerNotes = 0);
+    ~SetEditMode() override {}
+
+    bool perform() override;
+    bool undo() override;
+
+    int getSizeInUnits() override { return sizeof(SetEditMode); }
+
+public:
+
+    static SetEditMode* SetSelectMode(const LumatoneEditorState& stateIn) { return new SetEditMode(stateIn, LumatoneEditor::MouseMode::SELECT); }
+    static SetEditMode* SetAssignMode(const LumatoneEditorState& stateIn, bool autoIncrNotes, int incrChannelsPerNotes=0)
+    {
+        return new SetEditMode(stateIn, LumatoneEditor::MouseMode::ASSIGN, autoIncrNotes, incrChannelsPerNotes);
+    }
+
+private:
+
+    LumatoneEditor::MouseMode mouseMode;
+    bool incrementNotesState = false;
+    int incrementChannelsState = 0;
+
+    LumatoneEditor::MouseMode lastMouseMode;
+    bool lastIncrementNotesState = false;
+    int lastIncrementChannelsState = 0;
 };
 
 #endif // LUMATONE_EDITOR_CONTROL_ACTIONS_H

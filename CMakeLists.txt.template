@@ -116,7 +116,7 @@ juce_add_binary_data(LumatoneEditorAssets SOURCES ${EditorBinaryData})
 
 # juce_add_bundle_resources_directory(LumatoneEditor "${CMAKE_CURRENT_SOURCE_DIR}/Libraries/mac/lib")
 
-if (APPLE || ${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+if (APPLE OR ${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     target_link_libraries(LumatoneEditor
         PRIVATE
             LumatoneEditorAssets

@@ -13,14 +13,15 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      juce_DIR: juce-$JUCE_VERSION-osx
+      juce_DIR: ""
 
     steps:
       - uses: actions/checkout@v4
       - name: Install JUCE to $HOME
         run: |
-          wget https://github.com/juce-framework/JUCE/releases/download/$JUCE_VERSION/$juce_DIR.zip
-          unzip -d ~ $juce_DIR.zip
+          export juce_DIR=juce-${{ env.JUCE_VERSION }}-linux
+          wget https://github.com/juce-framework/JUCE/releases/download/${{ env.JUCE_VERSION }}/${{ env.juce_DIR }}.zip
+          unzip -d ~ ${{ env.juce_DIR }}.zip
       - name: Install APT dependencies
         run: |
           sudo apt update
@@ -57,14 +58,15 @@ jobs:
     runs-on: macos-latest
 
     env:
-      juce_DIR: juce-$env:JUCE_VERSION-osx
+      juce_DIR: ""
 
     steps:
       - uses: actions/checkout@v4
       - name: Install JUCE to $HOME
         run: |
-          wget https://github.com/juce-framework/JUCE/releases/download/$JUCE_VERSION/$juce_DIR.zip
-          unzip -d ~ $juce_DIR.zip
+          export juce_DIR=juce-${{ env.JUCE_VERSION }}-osx
+          wget https://github.com/juce-framework/JUCE/releases/download/${{ env.JUCE_VERSION }}/${{ env.juce_DIR }}.zip
+          unzip -d ~ ${{ env.juce_DIR }}.zip
       - name: Build Lumatone Editor
         run: |
           cp CMakeLists.txt.template CMakeLists.txt
@@ -92,13 +94,14 @@ jobs:
     runs-on: windows-latest
 
     env:
-      juce_DIR: juce-$env:JUCE_VERSION-windows
+      juce_DIR: ""
 
     steps:
       - uses: actions/checkout@v4
       - uses: microsoft/setup-msbuild@v2
       - name: Install JUCE to C:\
         run: |
+          echo juce-${{ env.JUCE_VERSION }}-windows >> ${{ env.juce_DIR }}
           Invoke-WebRequest https://github.com/juce-framework/JUCE/releases/download/${{env.JUCE_VERSION}}/${{env.juce_DIR}}.zip -OutFile ${{env.juce_DIR}}.zip
           7z x ${{env.juce_DIR}}.zip -o .
       - name: Build Lumatone Editor

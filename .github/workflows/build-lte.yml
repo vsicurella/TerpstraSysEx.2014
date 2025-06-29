@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 env:
   JUCE_VERSION: 7.0.5
-  ARTIFACTS: LumatoneEditor_artifacts
+  ARTIFACTS: LumatoneEditor_artefacts
 
 jobs:
   build-lte-linux:
@@ -16,7 +16,7 @@ jobs:
       - name: Install JUCE to $HOME
         run: |
           export juce_DIR=juce-${{ env.JUCE_VERSION }}-linux
-          wget https://github.com/juce-framework/JUCE/releases/download/${{ env.JUCE_VERSION }}/$juce_DIR.zip -o $juce_DIR.zip
+          wget https://github.com/juce-framework/JUCE/releases/download/${{ env.JUCE_VERSION }}/$juce_DIR.zip
           unzip $juce_DIR.zip -d ~/
           ls ~
       - name: Install APT dependencies
@@ -98,7 +98,7 @@ jobs:
         run: |
           Invoke-WebRequest https://github.com/juce-framework/JUCE/releases/download/${{env.JUCE_VERSION}}/juce-${{env.JUCE_VERSION}}-windows.zip -OutFile JUCE.zip
           dir
-          7z x JUCE.zip -oC:\JUCE
+          7z x JUCE.zip -oC:\
           C:
           dir C:\JUCE
       - name: Build Lumatone Editor

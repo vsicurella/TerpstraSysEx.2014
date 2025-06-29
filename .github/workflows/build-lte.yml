@@ -32,6 +32,10 @@ jobs:
       - name: Build Lumatone Editor
         run: |
           export juce_DIR=~/JUCE
+
+          # hack to fix issue with platform capitalization
+          sed -i 's/StandardApplicationCommandIds/StandardApplicationCommandIDs/g' Source/LumatoneMenu.h
+
           cp CMakeLists.txt.template CMakeLists.txt
           cmake -S . -B build
           # ~/JUCE/Projucer --resave TerpstraSysEx.jucer
@@ -78,6 +82,11 @@ jobs:
           # cd Builds/MacOSX
           # cd build/$ARTIFACTS
           ls
+          echo
+          ls build
+          echo
+          ls build/$ARTIFACTS
+          echo
           find build/$ARTIFACTS/Lumatone\ Editor.app
       - name: Upload Lumatone Editor
         uses: actions/upload-artifact@v4
@@ -89,6 +98,9 @@ jobs:
 
   build-lte-windows:
     name: Build Lumatone Editor (Windows)
+
+    env:
+      juce_DIR: "C:\\JUCE"
 
     runs-on: windows-latest
 

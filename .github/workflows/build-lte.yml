@@ -3,7 +3,7 @@ name: Build Lumatone Editor
 on: [push, pull_request]
 
 env:
-  JUCE_VERSION: 7.0.5
+  JUCE_VERSION: 7.0.12
   ARTIFACTS: LumatoneEditor_artefacts
 
 jobs:
@@ -83,7 +83,7 @@ jobs:
         with:
           name: LumatoneEditor-macOS
           # path: Builds/MacOSX/build/Release
-          path: build/$ARTIFACTS/Lumatone\ Editor
+          path: build/$ARTIFACTS/Lumatone\ Editor.app
           if-no-files-found: error
 
   build-lte-windows:
@@ -104,7 +104,7 @@ jobs:
       - name: Build Lumatone Editor
         run: |
           set juce_DIR=C:\JUCE
-          echo juceDir:%juce_DIR%
+          echo %juce_DIR%
           copy CMakeLists.txt.template CmakeLists.txt
           cmake -S . -B build
           # bash -c '/c/JUCE/Projucer --resave TerpstraSysEx.jucer'

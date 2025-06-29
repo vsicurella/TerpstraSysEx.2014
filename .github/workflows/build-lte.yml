@@ -99,8 +99,8 @@ jobs:
       - uses: microsoft/setup-msbuild@v2
       - name: Install JUCE to C:\
         run: |
-          Invoke-WebRequest https://github.com/juce-framework/JUCE/releases/download/%JUCE_VERSION%/%juce_DIR%.zip -OutFile %juce_DIR%.zip
-          7z x %juce_DIR%.zip -o .
+          Invoke-WebRequest https://github.com/juce-framework/JUCE/releases/download/$env:JUCE_VERSION/$env:juce_DIR%.zip -OutFile $env:juce_DIR.zip
+          7z x $env:juce_DIR.zip -o .
       - name: Build Lumatone Editor
         run: |
           copy CMakeLists.txt.template CmakeLists.txt
@@ -111,7 +111,7 @@ jobs:
       - name: List build directory
         run: |
           # cd Builds/VisualStudio2019
-          cd build\%ARTIFACTS%\Release\
+          cd build\$env:ARTIFACTS\Release\
           Get-ChildItem -Recurse
       - name: Upload Lumatone Editor
         uses: actions/upload-artifact@v4

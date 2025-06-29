@@ -101,7 +101,7 @@ jobs:
           7z x JUCE.zip -oC:\
       - name: Build Lumatone Editor
         run: |
-          $juce_DIR = C:\JUCE
+          $juce_DIR = "C:\JUCE"
           echo %juce_DIR%
           copy CMakeLists.txt.template CmakeLists.txt
           cmake -S . -B build

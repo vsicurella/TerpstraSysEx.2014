@@ -18,7 +18,6 @@ jobs:
           export juce_DIR=juce-${{ env.JUCE_VERSION }}-linux
           wget https://github.com/juce-framework/JUCE/releases/download/${{ env.JUCE_VERSION }}/$juce_DIR.zip
           unzip $juce_DIR.zip -d ~/
-          ls ~
       - name: Install APT dependencies
         run: |
           sudo apt update
@@ -32,19 +31,12 @@ jobs:
       - name: Build Lumatone Editor
         run: |
           export juce_DIR=~/JUCE
-
           cp CMakeLists.txt.template CMakeLists.txt
           cmake -S . -B build
-          # ~/JUCE/Projucer --resave TerpstraSysEx.jucer
-          # cd Builds/Linux
-          # cd build
-          # make CONFIG=Release
           cmake --build build --config Release
       - name: List build directory
         run: |
-          # cd Builds/Linux
           find build/$ARTIFACTS/Lumatone\ Editor
-          # find
       - name: Upload Lumatone Editor
         uses: actions/upload-artifact@v4
         with:
@@ -63,27 +55,14 @@ jobs:
           export juce_DIR=juce-${{ env.JUCE_VERSION }}-osx
           wget https://github.com/juce-framework/JUCE/releases/download/${{ env.JUCE_VERSION }}/$juce_DIR.zip
           unzip $juce_DIR.zip
-          ls
       - name: Build Lumatone Editor
         run: |
           export juce_DIR=JUCE
           cp CMakeLists.txt.template CMakeLists.txt
           cmake -S . -B build
-          # ~/JUCE/Projucer.app/Contents/MacOS/Projucer --resave TerpstraSysEx.jucer
-          # cd Builds/MacOSX
-          # cd build
-          # xcodebuild -configuration Release
           cmake --build build --config Release
       - name: List build directory
         run: |
-          # cd Builds/MacOSX
-          # cd build/$ARTIFACTS
-          ls
-          echo
-          ls build
-          echo
-          ls build/$ARTIFACTS
-          echo
           find build/$ARTIFACTS/Lumatone\ Editor.app
       - name: Upload Lumatone Editor
         uses: actions/upload-artifact@v4
@@ -111,27 +90,18 @@ jobs:
       - name: Build Lumatone Editor
         run: |
           $Global:juce_DIR = "C:\JUCE"
-          echo $juce_DIR
           copy CMakeLists.txt.template CmakeLists.txt
           cmake -S . -B build
-          # bash -c '/c/JUCE/Projucer --resave TerpstraSysEx.jucer'
-          # cd Builds/VisualStudio2022
           msbuild "build\LUMATONE_EDITOR.sln" /p:configuration=Release
       - name: List build directory
         run: |
-          # cd Builds/VisualStudio2019
           cd build\$env:ARTIFACTS\Release\
           Get-ChildItem -Recurse
       - name: Upload Lumatone Editor
         uses: actions/upload-artifact@v4
         with:
           name: LumatoneEditor-Windows
-          # path: "Builds/VisualStudio2019/x64/Release/App/Lumatone Editor.exe"
-          path: "build/${{ env.ARTIFACTS }}/Release/Lumatone Editor.exe"
-          if-no-files-found: error
-      - name: Upload dynamic libraries
-        uses: actions/upload-artifact@v4
-        with:
-          name: LumatoneEditor-Windows
-          path: Libraries/win64/bin/*.dll
+          path: |
+            "build/${{ env.ARTIFACTS }}/Release/Lumatone Editor.exe"
+            Libraries/win64/bin/*.dll
           if-no-files-found: error

@@ -132,7 +132,7 @@ if (APPLE || ${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
             juce::juce_recommended_lto_flags
             juce::juce_recommended_warning_flags
         )
-else
+else()
     target_link_libraries(LumatoneEditor
         PRIVATE
             LumatoneEditorAssets
@@ -148,7 +148,7 @@ else
             juce::juce_recommended_lto_flags
             juce::juce_recommended_warning_flags
         )
-endif
+endif()
 
 # if (APPLE)
 #     add_custom_command(

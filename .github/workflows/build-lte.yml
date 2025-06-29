@@ -12,11 +12,13 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      juce_DIR: juce-$JUCE_VERSION-osx
+
     steps:
       - uses: actions/checkout@v4
       - name: Install JUCE to $HOME
         run: |
-          export juce_DIR=juce-$JUCE_VERSION-linux
           wget https://github.com/juce-framework/JUCE/releases/download/$JUCE_VERSION/$juce_DIR.zip
           unzip -d ~ $juce_DIR.zip
       - name: Install APT dependencies
@@ -54,11 +56,13 @@ jobs:
 
     runs-on: macos-latest
 
+    env:
+      juce_DIR: juce-$JUCE_VERSION-osx
+
     steps:
       - uses: actions/checkout@v4
       - name: Install JUCE to $HOME
         run: |
-          export juce_DIR=juce-$JUCE_VERSION-osx
           wget https://github.com/juce-framework/JUCE/releases/download/$JUCE_VERSION/$juce_DIR.zip
           unzip -d ~ $juce_DIR.zip
       - name: Build Lumatone Editor
@@ -87,14 +91,16 @@ jobs:
 
     runs-on: windows-latest
 
+    env:
+      juce_DIR: juce-$JUCE_VERSION-windows
+
     steps:
       - uses: actions/checkout@v4
       - uses: microsoft/setup-msbuild@v2
       - name: Install JUCE to C:\
         run: |
-          set juce_DIR=juce-%JUCE_VERSION%-windows
-          Invoke-WebRequest https://github.com/juce-framework/JUCE/releases/download/%JUCE_VERSION%/%juce_DIR%.zip -OutFile %juce_DIR%.zip
-          7z x %juce_DIR.zip% -o .
+          Invoke-WebRequest https://github.com/juce-framework/JUCE/releases/download/$JUCE_VERSION/$juce_DIR.zip -OutFile $juce_DIR.zip
+          7z x $juce_DIR.zip -o .
       - name: Build Lumatone Editor
         run: |
           copy CMakeLists.txt.template CmakeLists.txt
@@ -105,7 +111,7 @@ jobs:
       - name: List build directory
         run: |
           # cd Builds/VisualStudio2019
-          cd build\%ARTIFACTS%\Release\
+          cd build\$ARTIFACTS\Release\
           Get-ChildItem -Recurse
       - name: Upload Lumatone Editor
         uses: actions/upload-artifact@v4

@@ -40,13 +40,19 @@ if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     set_target_properties( SSHLib PROPERTIES IMPORTED_IMPLIB "${LibraryPath}/lib/libssh2.dll.a" )
 endif()
 
-if (UNIX)
+if (APPLE)
     set(LibraryPath "${CMAKE_CURRENT_SOURCE_DIR}/Libraries/mac")
     set(LibraryInclude "${LibraryPath}/include")
     set(LibraryCode "${LibraryInclude}/libssh2.h")
 
     add_library(SSHLib SHARED IMPORTED)
     set_target_properties( SSHLib PROPERTIES IMPORTED_LOCATION "${LibraryPath}/lib/libssh2.dylib")
+elseif(UNIX)
+    find_package(PkgConfig REQUIRED)
+    pkg_check_modules(SSHLib REQUIRED libssh2)
+
+    target_include_directories(LumatoneEditor PUBLIC &{SSHLib_INCLUDE_DIRS})
+    target_compile_options(LumatoneEditor PUBLIC &{SSHLib_CFLAGS_OTHER})
 endif()
 
 include_directories(${LibraryInclude})

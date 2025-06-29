@@ -57,7 +57,7 @@ jobs:
     runs-on: macos-latest
 
     env:
-      juce_DIR: juce-$JUCE_VERSION-osx
+      juce_DIR: juce-$env:JUCE_VERSION-osx
 
     steps:
       - uses: actions/checkout@v4
@@ -92,7 +92,7 @@ jobs:
     runs-on: windows-latest
 
     env:
-      juce_DIR: juce-${{ env.JUCE_VERSION }}-windows
+      juce_DIR: juce-$JUCE_VERSION-windows
 
     steps:
       - uses: actions/checkout@v4

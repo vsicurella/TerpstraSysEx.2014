@@ -97,11 +97,12 @@ jobs:
         run: |
           Invoke-WebRequest https://github.com/juce-framework/JUCE/releases/download/${{env.JUCE_VERSION}}/juce-${{env.JUCE_VERSION}}-windows.zip -OutFile JUCE.zip
           dir
-          7z x JUCE.zip
+          7z x JUCE.zip -oC:\JUCE
+          C:
           dir
       - name: Build Lumatone Editor
         run: |
-          set juce_DIR=JUCE
+          set juce_DIR=C:\JUCE
           copy CMakeLists.txt.template CmakeLists.txt
           cmake -S . -B build
           # bash -c '/c/JUCE/Projucer --resave TerpstraSysEx.jucer'

@@ -2,7 +2,9 @@ name: Build Lumatone Editor
 
 on: [push, pull_request]
 
-env: {}
+env:
+  JUCE_VERSION: 7.0.5
+  ARTIFACTS: $ARTIFACTS
 
 jobs:
   build-lte-linux:
@@ -14,26 +16,30 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install JUCE to $HOME
         run: |
-          wget https://github.com/juce-framework/JUCE/releases/download/6.1.6/juce-6.1.6-linux.zip
-          unzip -d ~ juce-6.1.6-linux.zip
+          export juce_DIR=juce-$JUCE_VERSION-linux
+          wget https://github.com/juce-framework/JUCE/releases/download/$JUCE_VERSION/$juce_DIR.zip
+          unzip -d ~ $juce_DIR.zip
       - name: Install APT dependencies
         run: |
           sudo apt update
           sudo apt install libssh2-1-dev libasound2-dev libjack-jackd2-dev ladspa-sdk libcurl4-openssl-dev  libfreetype6-dev libx11-dev libxcomposite-dev libxcursor-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev mesa-common-dev
       - name: Build Lumatone Editor
         run: |
-          ~/JUCE/Projucer --resave TerpstraSysEx.jucer
-          cd Builds/Linux
+          cmake -S . -B build
+          # ~/JUCE/Projucer --resave TerpstraSysEx.jucer
+          # cd Builds/Linux
+          cd build
           make CONFIG=Release
       - name: List build directory
         run: |
-          cd Builds/Linux
+          # cd Builds/Linux
+          cd build/$ARTIFACTS/Release
           find
       - name: Upload Lumatone Editor
         uses: actions/upload-artifact@v2
         with:
           name: LumatoneEditor-Linux
-          path: Builds/Linux/build/Lumatone\ Editor
+          path: build/$ARTIFACTS/Release/Lumatone\ Editor
           if-no-files-found: error
 
   build-lte-macos:
@@ -45,22 +51,27 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install JUCE to $HOME
         run: |
-          wget https://github.com/juce-framework/JUCE/releases/download/6.1.6/juce-6.1.6-osx.zip
-          unzip -d ~ juce-6.1.6-osx.zip
+          export juce_DIR=juce-$JUCE_VERSION-osx
+          wget https://github.com/juce-framework/JUCE/releases/download/$JUCE_VERSION/$juce_DIR.zip
+          unzip -d ~ $juce_DIR.zip
       - name: Build Lumatone Editor
         run: |
-          ~/JUCE/Projucer.app/Contents/MacOS/Projucer --resave TerpstraSysEx.jucer
-          cd Builds/MacOSX
+          cmake -S . -B build
+          # ~/JUCE/Projucer.app/Contents/MacOS/Projucer --resave TerpstraSysEx.jucer
+          # cd Builds/MacOSX
+          cd build
           xcodebuild -configuration Release
       - name: List build directory
         run: |
-          cd Builds/MacOSX
+          # cd Builds/MacOSX
+          cd build/$ARTIFACTS/Release/
           find .
       - name: Upload Lumatone Editor
         uses: actions/upload-artifact@v2
         with:
           name: LumatoneEditor-macOS
-          path: Builds/MacOSX/build/Release
+          # path: Builds/MacOSX/build/Release
+          path: build/$ARTIFACTS/Release
           if-no-files-found: error
 
   build-lte-windows:
@@ -73,22 +84,26 @@ jobs:
       - uses: microsoft/setup-msbuild@v1.1
       - name: Install JUCE to C:\
         run: |
-          Invoke-WebRequest https://github.com/juce-framework/JUCE/releases/download/6.1.6/juce-6.1.6-windows.zip -OutFile juce-6.1.6-windows.zip
-          7z x juce-6.1.6-windows.zip -oC:\
+          set juce_DIR=juce-#JUCE_VERSION-windows
+          Invoke-WebRequest https://github.com/juce-framework/JUCE/releases/download/$JUCE_VERSION/$juce_DIR.zip -OutFile $juce_DIR.zip
+          7z x $juce_DIR.zip -o .
       - name: Build Lumatone Editor
         run: |
-          bash -c '/c/JUCE/Projucer --resave TerpstraSysEx.jucer'
-          cd Builds/VisualStudio2019
-          msbuild "Lumatone Editor.sln" /p:configuration=Release
+          cmake -S . -B build
+          # bash -c '/c/JUCE/Projucer --resave TerpstraSysEx.jucer'
+          # cd Builds/VisualStudio2022
+          msbuild "build\LUMATONE_EDITOR.sln" /p:configuration=Release
       - name: List build directory
         run: |
-          cd Builds/VisualStudio2019
+          # cd Builds/VisualStudio2019
+          cd build\$ARTIFACTS\Release\
           Get-ChildItem -Recurse
       - name: Upload Lumatone Editor
         uses: actions/upload-artifact@v2
         with:
           name: LumatoneEditor-Windows
-          path: "Builds/VisualStudio2019/x64/Release/App/Lumatone Editor.exe"
+          # path: "Builds/VisualStudio2019/x64/Release/App/Lumatone Editor.exe"
+          path: "build\\$ARTIFACTS\\Release\\Lumatone Editor.exe"
           if-no-files-found: error
       - name: Upload dynamic libraries
         uses: actions/upload-artifact@v2

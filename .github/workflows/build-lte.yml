@@ -33,9 +33,6 @@ jobs:
         run: |
           export juce_DIR=~/JUCE
 
-          # hack to fix issue with platform capitalization
-          sed -i 's/StandardApplicationCommandIds/StandardApplicationCommandIDs/g' Source/LumatoneMenu.h
-
           cp CMakeLists.txt.template CMakeLists.txt
           cmake -S . -B build
           # ~/JUCE/Projucer --resave TerpstraSysEx.jucer
@@ -52,7 +49,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: LumatoneEditor-Linux
-          path: build/$ARTIFACTS/Lumatone\ Editor
+          path: build/${{ env.ARTIFACTS }}/Lumatone\ Editor
           if-no-files-found: error
 
   build-lte-macos:
@@ -93,7 +90,7 @@ jobs:
         with:
           name: LumatoneEditor-macOS
           # path: Builds/MacOSX/build/Release
-          path: "build/$ARTIFACTS/Lumatone Editor.app"
+          path: "build/${{ env.ARTIFACTS }}/Lumatone Editor.app"
           if-no-files-found: error
 
   build-lte-windows:
@@ -130,7 +127,7 @@ jobs:
         with:
           name: LumatoneEditor-Windows
           # path: "Builds/VisualStudio2019/x64/Release/App/Lumatone Editor.exe"
-          path: "build/$ARTIFACTS/Release/Lumatone Editor.exe"
+          path: "build/${{ env.ARTIFACTS }}/Release/Lumatone Editor.exe"
           if-no-files-found: error
       - name: Upload dynamic libraries
         uses: actions/upload-artifact@v4

@@ -50,10 +50,11 @@ if (APPLE)
 elseif(UNIX)
     find_package(PkgConfig REQUIRED)
     pkg_check_modules(SSHLib REQUIRED libssh2)
-    set(SSHLib "${SSHLib_LIBRARIES}")
 
     target_include_directories(LumatoneEditor PUBLIC ${SSHLib_INCLUDE_DIRS})
     target_compile_options(LumatoneEditor PUBLIC ${SSHLib_CFLAGS_OTHER})
+    #set(SSHLib "${SSHLib_LIBRARIES}")
+    target_link_libraries(LumatoneEditor PRIVATE ${SSHLib_LIBRARIES})
 endif()
 
 include_directories(${LibraryInclude})

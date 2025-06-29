@@ -99,8 +99,8 @@ jobs:
       - uses: microsoft/setup-msbuild@v2
       - name: Install JUCE to C:\
         run: |
-          Invoke-WebRequest https://github.com/juce-framework/JUCE/releases/download/$JUCE_VERSION/$juce_DIR.zip -OutFile $juce_DIR.zip
-          7z x $juce_DIR.zip -o .
+          Invoke-WebRequest https://github.com/juce-framework/JUCE/releases/download/%JUCE_VERSION%/%juce_DIR%.zip -OutFile %juce_DIR%.zip
+          7z x %juce_DIR%.zip -o .
       - name: Build Lumatone Editor
         run: |
           copy CMakeLists.txt.template CmakeLists.txt
@@ -111,14 +111,14 @@ jobs:
       - name: List build directory
         run: |
           # cd Builds/VisualStudio2019
-          cd build\$ARTIFACTS\Release\
+          cd build\%ARTIFACTS%\Release\
           Get-ChildItem -Recurse
       - name: Upload Lumatone Editor
         uses: actions/upload-artifact@v4
         with:
           name: LumatoneEditor-Windows
           # path: "Builds/VisualStudio2019/x64/Release/App/Lumatone Editor.exe"
-          path: "build\\%ARTIFACTS%\\Release\\Lumatone Editor.exe"
+          path: "build/$ARTIFACTS/Release/Lumatone Editor.exe"
           if-no-files-found: error
       - name: Upload dynamic libraries
         uses: actions/upload-artifact@v4

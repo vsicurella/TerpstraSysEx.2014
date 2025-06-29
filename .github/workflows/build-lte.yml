@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install JUCE to $HOME
         run: |
-          echo juce-${{ env.JUCE_VERSION }}-linux >> $juce_DIR
+          export juce_DIR=juce-${{ env.JUCE_VERSION }}-linux
           wget https://github.com/juce-framework/JUCE/releases/download/${{ env.JUCE_VERSION }}/$juce_DIR.zip
           unzip -d ~ $juce_DIR.zip
       - name: Install APT dependencies
@@ -64,7 +64,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Install JUCE to $HOME
         run: |
-          echo juce-${{ env.JUCE_VERSION }}-osx >> $juce_DIR
+          export juce_DIR=juce-${{ env.JUCE_VERSION }}-osx
           wget https://github.com/juce-framework/JUCE/releases/download/${{ env.JUCE_VERSION }}/${{ env.juce_DIR }}.zip
           unzip -d ~ ${{ env.juce_DIR }}.zip
       - name: Build Lumatone Editor
@@ -101,8 +101,8 @@ jobs:
       - uses: microsoft/setup-msbuild@v2
       - name: Install JUCE to C:\
         run: |
-          echo juce-${{ env.JUCE_VERSION }}-windows >> $env:juce_DIR
-          Invoke-WebRequest https://github.com/juce-framework/JUCE/releases/download/${{env.JUCE_VERSION}}/${{env.juce_DIR}}.zip -OutFile ${{env.juce_DIR}}.zip
+          set juce_DIR=juce-${{ env.JUCE_VERSION }}-windows
+          Invoke-WebRequest https://github.com/juce-framework/JUCE/releases/download/${{env.JUCE_VERSION}}/${{env.juce_DIR}}.zip -OutFile %juce_DIR%.zip
           7z x ${{env.juce_DIR}}.zip -o .
       - name: Build Lumatone Editor
         run: |

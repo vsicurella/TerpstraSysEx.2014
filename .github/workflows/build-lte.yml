@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install JUCE to $HOME
         run: |
           export juce_DIR=juce-$JUCE_VERSION-linux
@@ -36,7 +36,7 @@ jobs:
           cd build/$ARTIFACTS/Release
           find
       - name: Upload Lumatone Editor
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: LumatoneEditor-Linux
           path: build/$ARTIFACTS/Release/Lumatone\ Editor
@@ -48,7 +48,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Install JUCE to $HOME
         run: |
           export juce_DIR=juce-$JUCE_VERSION-osx
@@ -67,7 +67,7 @@ jobs:
           cd build/$ARTIFACTS/Release/
           find .
       - name: Upload Lumatone Editor
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: LumatoneEditor-macOS
           # path: Builds/MacOSX/build/Release
@@ -80,8 +80,8 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v2
-      - uses: microsoft/setup-msbuild@v1.1
+      - uses: actions/checkout@v4
+      - uses: microsoft/setup-msbuild@v2
       - name: Install JUCE to C:\
         run: |
           set juce_DIR=juce-#JUCE_VERSION-windows
@@ -99,14 +99,14 @@ jobs:
           cd build\$ARTIFACTS\Release\
           Get-ChildItem -Recurse
       - name: Upload Lumatone Editor
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: LumatoneEditor-Windows
           # path: "Builds/VisualStudio2019/x64/Release/App/Lumatone Editor.exe"
           path: "build\\$ARTIFACTS\\Release\\Lumatone Editor.exe"
           if-no-files-found: error
       - name: Upload dynamic libraries
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: LumatoneEditor-Windows
           path: Libraries/win64/bin/*.dll

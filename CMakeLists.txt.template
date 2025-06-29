@@ -53,8 +53,6 @@ elseif(UNIX)
 
     target_include_directories(LumatoneEditor PUBLIC ${SSHLib_INCLUDE_DIRS})
     target_compile_options(LumatoneEditor PUBLIC ${SSHLib_CFLAGS_OTHER})
-    #set(SSHLib "${SSHLib_LIBRARIES}")
-    target_link_libraries(LumatoneEditor PRIVATE ${SSHLib_LIBRARIES})
 endif()
 
 include_directories(${LibraryInclude})
@@ -118,22 +116,39 @@ juce_add_binary_data(LumatoneEditorAssets SOURCES ${EditorBinaryData})
 
 # juce_add_bundle_resources_directory(LumatoneEditor "${CMAKE_CURRENT_SOURCE_DIR}/Libraries/mac/lib")
 
-target_link_libraries(LumatoneEditor
-    PRIVATE
-        LumatoneEditorAssets
-        juce::juce_gui_extra
-        juce::juce_audio_utils
-        juce::juce_audio_devices
-        juce::juce_opengl
+if (APPLE || ${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+    target_link_libraries(LumatoneEditor
+        PRIVATE
+            LumatoneEditorAssets
+            juce::juce_gui_extra
+            juce::juce_audio_utils
+            juce::juce_audio_devices
+            juce::juce_opengl
 
-        # CryptoLib
-        SSHLib
+            SSHLib
 
-    PUBLIC
-        juce::juce_recommended_config_flags
-        juce::juce_recommended_lto_flags
-        juce::juce_recommended_warning_flags
-    )
+        PUBLIC
+            juce::juce_recommended_config_flags
+            juce::juce_recommended_lto_flags
+            juce::juce_recommended_warning_flags
+        )
+else
+    target_link_libraries(LumatoneEditor
+        PRIVATE
+            LumatoneEditorAssets
+            juce::juce_gui_extra
+            juce::juce_audio_utils
+            juce::juce_audio_devices
+            juce::juce_opengl
+
+            ${SSHLib_LIBRARIES}
+
+        PUBLIC
+            juce::juce_recommended_config_flags
+            juce::juce_recommended_lto_flags
+            juce::juce_recommended_warning_flags
+        )
+endif
 
 # if (APPLE)
 #     add_custom_command(

@@ -4,7 +4,7 @@ on: [push, pull_request]
 
 env:
   JUCE_VERSION: 7.0.5
-  ARTIFACTS: $ARTIFACTS
+  ARTIFACTS: LumatoneEditor_artifacts
 
 jobs:
   build-lte-linux:
@@ -92,8 +92,8 @@ jobs:
       - uses: microsoft/setup-msbuild@v2
       - name: Install JUCE to C:\
         run: |
-          set juce_DIR=juce-#JUCE_VERSION-windows
-          Invoke-WebRequest https://github.com/juce-framework/JUCE/releases/download/$JUCE_VERSION/%juce_DIR%.zip -OutFile %juce_DIR%.zip
+          set juce_DIR=juce-%JUCE_VERSION%-windows
+          Invoke-WebRequest https://github.com/juce-framework/JUCE/releases/download/%JUCE_VERSION%/%juce_DIR%.zip -OutFile %juce_DIR%.zip
           7z x %juce_DIR.zip% -o .
       - name: Build Lumatone Editor
         run: |

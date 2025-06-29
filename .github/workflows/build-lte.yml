@@ -77,13 +77,14 @@ jobs:
         run: |
           # cd Builds/MacOSX
           # cd build/$ARTIFACTS
+          ls
           find build/$ARTIFACTS/Lumatone\ Editor.app
       - name: Upload Lumatone Editor
         uses: actions/upload-artifact@v4
         with:
           name: LumatoneEditor-macOS
           # path: Builds/MacOSX/build/Release
-          path: build/$ARTIFACTS/Lumatone\ Editor.app
+          path: "build/$ARTIFACTS/Lumatone Editor.app"
           if-no-files-found: error
 
   build-lte-windows:
@@ -97,13 +98,10 @@ jobs:
       - name: Install JUCE to C:\
         run: |
           Invoke-WebRequest https://github.com/juce-framework/JUCE/releases/download/${{env.JUCE_VERSION}}/juce-${{env.JUCE_VERSION}}-windows.zip -OutFile JUCE.zip
-          dir
           7z x JUCE.zip -oC:\
-          C:
-          dir C:\JUCE
       - name: Build Lumatone Editor
         run: |
-          set juce_DIR=C:\JUCE
+          $juce_DIR = C:\JUCE
           echo %juce_DIR%
           copy CMakeLists.txt.template CmakeLists.txt
           cmake -S . -B build

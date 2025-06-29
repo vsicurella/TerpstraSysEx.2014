@@ -17,9 +17,8 @@ jobs:
         run: |
           export juce_DIR=juce-${{ env.JUCE_VERSION }}-linux
           wget https://github.com/juce-framework/JUCE/releases/download/${{ env.JUCE_VERSION }}/$juce_DIR.zip -o $juce_DIR.zip
-          ls
-          unzip $juce_DIR.zip
-          ls
+          unzip $juce_DIR.zip -d ~/
+          ls ~
       - name: Install APT dependencies
         run: |
           sudo apt update
@@ -32,23 +31,24 @@ jobs:
               libglu1-mesa-dev mesa-common-dev
       - name: Build Lumatone Editor
         run: |
-          export juce_DIR=JUCE
+          export juce_DIR=~/JUCE
           cp CMakeLists.txt.template CMakeLists.txt
           cmake -S . -B build
           # ~/JUCE/Projucer --resave TerpstraSysEx.jucer
           # cd Builds/Linux
-          cd build
-          make CONFIG=Release
+          # cd build
+          # make CONFIG=Release
+          cmake --build build --config Release
       - name: List build directory
         run: |
           # cd Builds/Linux
-          cd build/$ARTIFACTS/Release
+          cd build/$ARTIFACTS/Lumatone\ Editor
           find
       - name: Upload Lumatone Editor
         uses: actions/upload-artifact@v4
         with:
           name: LumatoneEditor-Linux
-          path: build/$ARTIFACTS/Release/Lumatone\ Editor
+          path: build/$ARTIFACTS/Lumatone\ Editor
           if-no-files-found: error
 
   build-lte-macos:
@@ -70,19 +70,20 @@ jobs:
           cmake -S . -B build
           # ~/JUCE/Projucer.app/Contents/MacOS/Projucer --resave TerpstraSysEx.jucer
           # cd Builds/MacOSX
-          cd build
-          xcodebuild -configuration Release
+          # cd build
+          # xcodebuild -configuration Release
+          cmake --build build --config Release
       - name: List build directory
         run: |
           # cd Builds/MacOSX
-          cd build/$ARTIFACTS/Release/
-          find .
+          cd build/$ARTIFACTS/
+          find ./Lumatone\ Editor
       - name: Upload Lumatone Editor
         uses: actions/upload-artifact@v4
         with:
           name: LumatoneEditor-macOS
           # path: Builds/MacOSX/build/Release
-          path: build/$ARTIFACTS/Release
+          path: build/$ARTIFACTS/Lumatone\ Editor
           if-no-files-found: error
 
   build-lte-windows:
@@ -99,7 +100,7 @@ jobs:
           dir
           7z x JUCE.zip -oC:\JUCE
           C:
-          dir
+          dir C:\JUCE
       - name: Build Lumatone Editor
         run: |
           set juce_DIR=C:\JUCE

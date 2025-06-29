@@ -31,6 +31,7 @@ jobs:
               libglu1-mesa-dev mesa-common-dev
       - name: Build Lumatone Editor
         run: |
+          cp CMakeLists.txt.template CMakeLists.txt
           cmake -S . -B build
           # ~/JUCE/Projucer --resave TerpstraSysEx.jucer
           # cd Builds/Linux
@@ -62,6 +63,7 @@ jobs:
           unzip -d ~ $juce_DIR.zip
       - name: Build Lumatone Editor
         run: |
+          cp CMakeLists.txt.template CMakeLists.txt
           cmake -S . -B build
           # ~/JUCE/Projucer.app/Contents/MacOS/Projucer --resave TerpstraSysEx.jucer
           # cd Builds/MacOSX
@@ -95,6 +97,7 @@ jobs:
           7z x %juce_DIR.zip% -o .
       - name: Build Lumatone Editor
         run: |
+          copy CMakeLists.txt.template CmakeLists.txt
           cmake -S . -B build
           # bash -c '/c/JUCE/Projucer --resave TerpstraSysEx.jucer'
           # cd Builds/VisualStudio2022

@@ -16,7 +16,7 @@ jobs:
       - name: Install JUCE to $HOME
         run: |
           wget https://github.com/juce-framework/JUCE/releases/download/${{ env.JUCE_VERSION }}/juce-${{ env.JUCE_VERSION }}-linux.zip -o JUCE.zip
-          unzip -d ~ JUCE.zip
+          unzip JUCE.zip
       - name: Install APT dependencies
         run: |
           sudo apt update
@@ -57,7 +57,7 @@ jobs:
       - name: Install JUCE to $HOME
         run: |
           wget https://github.com/juce-framework/JUCE/releases/download/${{ env.JUCE_VERSION }}/juce-${{ env.JUCE_VERSION }}-osx.zip -o JUCE.zip
-          unzip -d ~ JUCE.zip
+          unzip JUCE.zip
       - name: Build Lumatone Editor
         run: |
           export juce_DIR=JUCE
@@ -91,7 +91,7 @@ jobs:
       - name: Install JUCE to C:\
         run: |
           Invoke-WebRequest https://github.com/juce-framework/JUCE/releases/download/${{env.JUCE_VERSION}}/juce-${{env.JUCE_VERSION}}-windows.zip -OutFile JUCE.zip
-          7z x JUCE.zip -o C:\JUCE
+          7z x JUCE.zip
       - name: Build Lumatone Editor
         run: |
           set juce_DIR=JUCE

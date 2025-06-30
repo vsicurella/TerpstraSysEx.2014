@@ -46,7 +46,8 @@ namespace Lumatone {
 			colourViewRGB = 0x200501,
 			colourViewModel = 0x200502,
 
-			aboutSysEx = 0x300100
+			aboutSysEx = 0x300100,
+			quit = 0xF00100
 		};
 
 		class MainMenuModel : public juce::MenuBarModel

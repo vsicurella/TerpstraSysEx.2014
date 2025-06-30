@@ -254,7 +254,9 @@ void TerpstraSysExApplication::getAllCommands(juce::Array <juce::CommandID>& com
         Lumatone::Menu::commandIDs::colourViewModel,
 
         Lumatone::Menu::commandIDs::aboutSysEx,
-        Lumatone::Debug::commandIDs::toggleDeveloperMode
+        Lumatone::Debug::commandIDs::toggleDeveloperMode,
+
+        Lumatone::Menu::commandIDs::quit
     };
 
     commands.addArray(ids, juce::numElementsInArray(ids));
@@ -399,6 +401,12 @@ void TerpstraSysExApplication::getCommandInfo(juce::CommandID commandID, juce::A
         result.setActive(true);
         break;
 
+    case Lumatone::Menu::commandIDs::quit:
+        result.setInfo("Quit", "Close application", "File", 0);
+        result.addDefaultKeypress('q', juce::ModifierKeys::commandModifier);
+        result.setActive(true);
+        break;
+
     default:
         juce::JUCEApplication::getCommandInfo(commandID, result);
         break;
@@ -458,6 +466,11 @@ bool TerpstraSysExApplication::perform(const juce::ApplicationCommandTarget::Inv
 
     case Lumatone::Debug::commandIDs::toggleDeveloperMode:
         return toggleDeveloperMode();
+
+    case Lumatone::Menu::commandIDs::quit:
+        juce::JUCEApplication::quit();
+        return true;
+
     default:
         return juce::JUCEApplication::perform(info);
     }

@@ -118,7 +118,7 @@ public:
     //==================================================================
 
     void drawDocumentWindowTitleBar(juce::DocumentWindow& window, juce::Graphics& g,
-        int w, int h, int /*titleSpaceX*/, int /*titleSpaceW*/, const juce::Image* /*icon*/, bool /*drawTitleTextOnLeft*/) override
+        int w, int h, int titleSpaceX, int titleSpaceW, const juce::Image* icon, bool drawTitleTextOnLeft) override
     {
         g.fillAll(findColour(LumatoneEditorColourIDs::MediumBackground));
 
@@ -192,10 +192,11 @@ public:
     class LumatoneEditorCompactWindow : public juce::LookAndFeel_V4
     {
     public:
+
         LumatoneEditorCompactWindow(const LumatoneEditorLookAndFeel* parentIn) : parent(parentIn) {};
 
         void drawDocumentWindowTitleBar(juce::DocumentWindow& window, juce::Graphics& g,
-            int w, int h, int /*titleSpaceX*/, int /*titleSpaceW*/, const juce::Image* /*icon*/, bool /*drawTitleTextOnLeft*/) override
+            int w, int h, int titleSpaceX, int titleSpaceW, const juce::Image* icon, bool drawTitleTextOnLeft) override
         {
             g.fillAll(parent->findColour(LumatoneEditorColourIDs::HeaderBackground));
 
@@ -1211,17 +1212,76 @@ public:
     //==================================================================
 
     int getTabButtonSpaceAroundImage() override { return 0; }
-    int getTabButtonOverlap(int /*tabDepth*/) override { return 0; }
-    int getTabButtonBestWidth(juce::TabBarButton& tbb, int /*tabDepth*/) override
+
+    int getTabButtonOverlap(int tabDepth) override { return 0; }
+
+    int getTabButtonBestWidth(juce::TabBarButton& tbb, int tabDepth) override
     {
         juce::TabbedButtonBar& bar = tbb.getTabbedButtonBar();
         return bar.getWidth() / bar.getNumTabs();
     }
-    juce::Rectangle<int> getTabButtonExtraComponentBounds(const juce::TabBarButton& /*tbb*/, juce::Rectangle<int>& /*area*/, juce::Component& /*extraComp*/) override
+
+    juce::Rectangle<int> getTabButtonExtraComponentBounds(const juce::TabBarButton& tbb, juce::Rectangle<int>& area, juce::Component& extraComp) override
     {
         return juce::Rectangle<int>(400,400,400,400);
     }
-    void drawTabAreaBehindFrontButton(juce::TabbedButtonBar& /*tbb*/, juce::Graphics& /*g*/, int /*w*/, int /*h*/) override {}
+
+    void drawTabButton(juce::TabBarButton& tbb, juce::Graphics& g, bool isMouseOver, bool isMouseDown) override
+    {
+        juce::Colour c;
+
+        if (tbb.isFrontTab())
+            c = juce::Colours::white;
+
+        else if (isMouseOver)
+            c = c.withAlpha(0.15f);
+
+        g.setColour(c);
+        g.drawLine(0, tbb.getHeight(), tbb.getWidth(), tbb.getHeight(), 3.0f);
+
+        drawTabButtonText(tbb, g, isMouseOver, isMouseDown);
+    }
+
+    juce::Font getTabButtonFont(juce::TabBarButton& tbb, float height) override
+    {
+        return getTabBarFont().withHeight(height).withHorizontalScale(1.05f);
+    }
+
+    void drawTabButtonText(juce::TabBarButton& tbb, juce::Graphics& g, bool isMouseOver, bool isMouseDown) override
+    {
+        juce::Colour c = findColour(LumatoneEditorColourIDs::InactiveText); // Maybe should change this even though it's the same default colour
+
+        if (tbb.isFrontTab())
+            c = findColour(LumatoneEditorColourIDs::ActiveText);
+
+        else if (isMouseOver)
+            c = c.brighter(0.15f);
+
+        g.setColour(c);
+
+        float heightScalar = 0.54545455f * GLOBALFONTSCALAR;
+
+        juce::Font font = getTabButtonFont(tbb, tbb.getHeight() * heightScalar);
+
+        juce::NamedValueSet& barProperties = tbb.getTabbedButtonBar().getProperties();
+        if (barProperties.contains(LumatoneEditorStyleIDs::fontHeightScalar))
+            font = font.withHeight(font.getHeight() * (float)barProperties[LumatoneEditorStyleIDs::fontHeightScalar]);
+
+        g.setFont(font);
+
+        int textMargin = 0;
+        juce::Justification textJustify = juce::Justification::centred;
+
+        if (tbb.getTabbedButtonBar().getNumTabs() == 1)
+        {
+            textMargin = font.getStringWidth("  ");
+            textJustify = juce::Justification::centredLeft;
+        }
+
+        g.drawFittedText(tbb.getButtonText(), tbb.getTextArea().translated(textMargin, 0).toNearestInt(), textJustify, 0.0f);
+    }
+
+    void drawTabAreaBehindFrontButton(juce::TabbedButtonBar& tbb, juce::Graphics& g, int w, int h) override {}
 
 
     //==================================================================
@@ -1237,7 +1297,7 @@ public:
         g.fillPath(path);
     }
 
-    int getCallOutBoxBorderSize(const juce::CallOutBox& /*box*/) override
+    int getCallOutBoxBorderSize(const juce::CallOutBox& box) override
     {
         return 20;
     }

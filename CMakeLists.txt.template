@@ -164,6 +164,16 @@ endif()
 #     )
 # endif()
 
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+
+add_custom_command(
+    TARGET LumatoneEditor POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${LibraryPath}/bin
+        ${CMAKE_CURRENT_BINARY_DIR}/LumatoneEditor_artefacts/$<CONFIG>
+    )
+endif()
+
 # set_target_properties(LumatoneEditor PROPERTIES
 #                       RUNTIME_OUTPUT_DIRECTORY_DEBUG ./Builds/Debug
 #                       RUNTIME_OUTPUT_DIRECTORY_RELEASE ./Builds/Release

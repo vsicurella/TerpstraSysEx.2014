@@ -150,21 +150,34 @@ else()
         )
 endif()
 
-# if (APPLE)
-#     add_custom_command(
-#         LumatoneEditor ${JUCE_PRODUCT_NAME} POST_BUILD
-#         COMMAND
-#             ${CMAKE_COMMAND} -E copy
-#             "${LibraryPath}/lib/libssh2.dylib"
-#             "$<TARGET_FILE_DIR:${JUCE_PRODUCT_NAME}>/../Resources/libssh2.dylib"
-#     )
-#     add_custom_command(
-#         LumatoneEditor ${JUCE_PRODUCT_NAME} POST_BUILD
-#         COMMAND install_name_tool -change @rpath/libssh2.dylib @loader_path/../Frameworks/libssh2.dylib $<TARGET_FILE:${JUCE_PRODUCT_NAME}>
-#     )
-# endif()
+if (APPLE)
+    add_custom_command(
+        TARGET LumatoneEditor POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+            "../Libraries/mac/lib/libgpg-error.0.dylib"
+            "LumatoneEditor_artefacts/$<CONFIG>/Lumatone\ Editor.app/Contents/Frameworks/libgpg-error.dylib"
+    )
+    add_custom_command(
+        TARGET LumatoneEditor POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+            "../Libraries/mac/lib/libgcrypt.20.dylib"
+            "LumatoneEditor_artefacts/$<CONFIG>/Lumatone\ Editor.app/Contents/Frameworks/libgcrypt.dylib"
+    )
+    add_custom_command(
+        TARGET LumatoneEditor POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy
+            "../Libraries/mac/lib/libssh2.1.dylib"
+            "LumatoneEditor_artefacts/$<CONFIG>/Lumatone\ Editor.app/Contents/Frameworks/libssh2.dylib"
+    )
 
-if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+    add_custom_command(
+        TARGET LumatoneEditor POST_BUILD
+        COMMAND install_name_tool -change 
+            @rpath/libssh2.dylib @loader_path/../Frameworks/libssh2.dylib ${JUCE_PRODUCT_NAME}
+            LumatoneEditor_artefacts/$<CONFIG>/Lumatone\ Editor.app/Contents/MacOS/Lumatone\ Editor
+    )
+    
+else if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 
 add_custom_command(
     TARGET LumatoneEditor POST_BUILD

@@ -172,12 +172,12 @@ if (APPLE)
 
     add_custom_command(
         TARGET LumatoneEditor POST_BUILD
-        COMMAND install_name_tool -change 
+        COMMAND install_name_tool -change
             @rpath/libssh2.dylib @loader_path/../Frameworks/libssh2.dylib ${JUCE_PRODUCT_NAME}
             LumatoneEditor_artefacts/$<CONFIG>/Lumatone\ Editor.app/Contents/MacOS/Lumatone\ Editor
     )
-    
-else if (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+
+elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
 
 add_custom_command(
     TARGET LumatoneEditor POST_BUILD

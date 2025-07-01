@@ -100,7 +100,5 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: LumatoneEditor-Windows
-          path: |
-            "build/${{ env.ARTIFACTS }}/Release/Lumatone Editor.exe"
-            Libraries/win64/bin/*.dll
+          path: build/${{ env.ARTIFACTS }}/Release/
           if-no-files-found: error
